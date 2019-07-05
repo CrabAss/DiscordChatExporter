@@ -33,7 +33,7 @@ namespace DiscordChatExporter.Core.Models
             AvatarUrl = GetAvatarUrl(id, discriminator, avatarHash);
         }
 
-        public override string ToString() => FullName;
+        public override string ToString() => Id;
     }
 
     public partial class User

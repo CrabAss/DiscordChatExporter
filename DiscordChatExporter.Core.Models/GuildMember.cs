@@ -16,14 +16,14 @@ namespace DiscordChatExporter.Core.Models
 
         public DateTimeOffset JoinedAt { get; }
 
-        public DateTimeOffset PremiumSince { get; }
+        public DateTimeOffset? PremiumSince { get; }
 
         public bool IsDeaf { get; }
 
         public bool IsMute { get; }
 
         public GuildMember(User user, string nickname, IReadOnlyList<Role> roles, DateTimeOffset joinedAt,
-            DateTimeOffset premiumSince, bool isDeaf, bool isMute)
+            DateTimeOffset? premiumSince, bool isDeaf, bool isMute)
         {
             User = user;
             Nickname = nickname;
@@ -36,7 +36,7 @@ namespace DiscordChatExporter.Core.Models
             // ...
         }
 
-        public override string ToString() => User.FullName;
+        public override string ToString() => User.Id;
     }
 
     public partial class GuildMember

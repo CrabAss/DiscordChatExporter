@@ -21,7 +21,7 @@ namespace DiscordChatExporter.Core.Services
             params string[] parameters)
         {
             // Create retry policy
-            var retry = Retry.Create()
+            IRetry retry = Retry.Create()
                 .Catch<HttpErrorStatusCodeException>(false, e => (int) e.StatusCode >= 500)
                 .Catch<HttpErrorStatusCodeException>(false, e => (int) e.StatusCode == 429)
                 .WithMaxTryCount(10)
@@ -32,7 +32,7 @@ namespace DiscordChatExporter.Core.Services
             {
                 // Create request
                 const string apiRoot = "https://discordapp.com/api/v6";
-                using (var request = new HttpRequestMessage(HttpMethod.Get, $"{apiRoot}/{resource}/{endpoint}"))
+                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, $"{apiRoot}/{resource}/{endpoint}"))
                 {
                     // Set authorization header
                     request.Headers.Authorization = token.Type == AuthTokenType.Bot
@@ -40,10 +40,10 @@ namespace DiscordChatExporter.Core.Services
                         : new AuthenticationHeaderValue(token.Value);
 
                     // Add parameters
-                    foreach (var parameter in parameters)
+                    foreach (string parameter in parameters)
                     {
-                        var key = parameter.SubstringUntil("=");
-                        var value = parameter.SubstringAfter("=");
+                        string key = parameter.SubstringUntil("=");
+                        string value = parameter.SubstringAfter("=");
 
                         // Skip empty values
                         if (value.IsNullOrWhiteSpace())
@@ -53,7 +53,7 @@ namespace DiscordChatExporter.Core.Services
                     }
 
                     // Get response
-                    using (var response = await _httpClient.SendAsync(request))
+                    using (HttpResponseMessage response = await _httpClient.SendAsync(request))
                     {
                         // Check status code
                         // We throw our own exception here because default one doesn't have status code
@@ -61,7 +61,7 @@ namespace DiscordChatExporter.Core.Services
                             throw new HttpErrorStatusCodeException(response.StatusCode, response.ReasonPhrase);
 
                         // Get content
-                        var raw = await response.Content.ReadAsStringAsync();
+                        string raw = await response.Content.ReadAsStringAsync();
 
                         // Parse
                         return JToken.Parse(raw);
@@ -76,48 +76,58 @@ namespace DiscordChatExporter.Core.Services
             if (guildId == Guild.DirectMessages.Id)
                 return Guild.DirectMessages;
 
-            var response = await GetApiResponseAsync(token, "guilds", guildId);
-            var guild = ParseGuild(response);
+            JToken response = await GetApiResponseAsync(token, "guilds", guildId);
+            Guild guild = ParseGuild(response);
 
             return guild;
         }
 
+        public async Task<IReadOnlyList<GuildMember>> GetGuildMembersAsync(AuthToken token, string guildId)
+        {
+            // Special case for direct messages pseudo-guild ...
+
+            JToken response = await GetApiResponseAsync(token, "guilds", $"{guildId}/members");
+            GuildMember[] guildMembers = response.Select(ParseGuildMember).ToArray();
+
+            return guildMembers;
+        }
+
         public async Task<Channel> GetChannelAsync(AuthToken token, string channelId)
         {
-            var response = await GetApiResponseAsync(token, "channels", channelId);
-            var channel = ParseChannel(response);
+            JToken response = await GetApiResponseAsync(token, "channels", channelId);
+            Channel channel = ParseChannel(response);
 
             return channel;
         }
 
         public async Task<IReadOnlyList<Guild>> GetUserGuildsAsync(AuthToken token)
         {
-            var response = await GetApiResponseAsync(token, "users", "@me/guilds", "limit=100");
-            var guilds = response.Select(ParseGuild).ToArray();
+            JToken response = await GetApiResponseAsync(token, "users", "@me/guilds", "limit=100");
+            Guild[] guilds = response.Select(ParseGuild).ToArray();
 
             return guilds;
         }
 
         public async Task<IReadOnlyList<Channel>> GetDirectMessageChannelsAsync(AuthToken token)
         {
-            var response = await GetApiResponseAsync(token, "users", "@me/channels");
-            var channels = response.Select(ParseChannel).ToArray();
+            JToken response = await GetApiResponseAsync(token, "users", "@me/channels");
+            Channel[] channels = response.Select(ParseChannel).ToArray();
 
             return channels;
         }
 
         public async Task<IReadOnlyList<Channel>> GetGuildChannelsAsync(AuthToken token, string guildId)
         {
-            var response = await GetApiResponseAsync(token, "guilds", $"{guildId}/channels");
-            var channels = response.Select(ParseChannel).ToArray();
+            JToken response = await GetApiResponseAsync(token, "guilds", $"{guildId}/channels");
+            Channel[] channels = response.Select(ParseChannel).ToArray();
 
             return channels;
         }
 
         public async Task<IReadOnlyList<Role>> GetGuildRolesAsync(AuthToken token, string guildId)
         {
-            var response = await GetApiResponseAsync(token, "guilds", $"{guildId}/roles");
-            var roles = response.Select(ParseRole).ToArray();
+            JToken response = await GetApiResponseAsync(token, "guilds", $"{guildId}/roles");
+            Role[] roles = response.Select(ParseRole).ToArray();
 
             return roles;
         }
@@ -125,12 +135,12 @@ namespace DiscordChatExporter.Core.Services
         public async Task<IReadOnlyList<Message>> GetChannelMessagesAsync(AuthToken token, string channelId,
             DateTimeOffset? after = null, DateTimeOffset? before = null, IProgress<double> progress = null)
         {
-            var result = new List<Message>();
+            List<Message> result = new List<Message>();
 
             // Get the last message
-            var response = await GetApiResponseAsync(token, "channels", $"{channelId}/messages",
+            JToken response = await GetApiResponseAsync(token, "channels", $"{channelId}/messages",
                 "limit=1", $"before={before?.ToSnowflake()}");
-            var lastMessage = response.Select(ParseMessage).FirstOrDefault();
+            Message lastMessage = response.Select(ParseMessage).FirstOrDefault();
 
             // If the last message doesn't exist or it's outside of range - return
             if (lastMessage == null || lastMessage.Timestamp < after)
@@ -140,7 +150,7 @@ namespace DiscordChatExporter.Core.Services
             }
 
             // Get other messages
-            var offsetId = after?.ToSnowflake() ?? "0";
+            string offsetId = after?.ToSnowflake() ?? "0";
             while (true)
             {
                 // Get message batch
@@ -148,7 +158,7 @@ namespace DiscordChatExporter.Core.Services
                     "limit=100", $"after={offsetId}");
 
                 // Parse
-                var messages = response
+                Message[] messages = response
                     .Select(ParseMessage)
                     .Reverse() // reverse because messages appear newest first
                     .ToArray();
@@ -158,7 +168,7 @@ namespace DiscordChatExporter.Core.Services
                     break;
 
                 // Trim messages to range (until last message)
-                var messagesInRange = messages
+                Message[] messagesInRange = messages
                     .TakeWhile(m => m.Id != lastMessage.Id && m.Timestamp < lastMessage.Timestamp)
                     .ToArray();
 
@@ -190,26 +200,26 @@ namespace DiscordChatExporter.Core.Services
             IEnumerable<Message> messages)
         {
             // Get channels and roles
-            var channels = guildId != Guild.DirectMessages.Id
+            IReadOnlyList<Channel> channels = guildId != Guild.DirectMessages.Id
                 ? await GetGuildChannelsAsync(token, guildId)
                 : Array.Empty<Channel>();
-            var roles = guildId != Guild.DirectMessages.Id
+            IReadOnlyList<Role> roles = guildId != Guild.DirectMessages.Id
                 ? await GetGuildRolesAsync(token, guildId)
                 : Array.Empty<Role>();
 
             // Get users
-            var userMap = new Dictionary<string, User>();
-            foreach (var message in messages)
+            Dictionary<string, User> userMap = new Dictionary<string, User>();
+            foreach (Message message in messages)
             {
                 // Author
                 userMap[message.Author.Id] = message.Author;
 
                 // Mentioned users
-                foreach (var mentionedUser in message.MentionedUsers)
+                foreach (User mentionedUser in message.MentionedUsers)
                     userMap[mentionedUser.Id] = mentionedUser;
             }
 
-            var users = userMap.Values.ToArray();
+            User[] users = userMap.Values.ToArray();
 
             return new Mentionables(users, channels, roles);
         }
@@ -218,10 +228,10 @@ namespace DiscordChatExporter.Core.Services
             DateTimeOffset? after = null, DateTimeOffset? before = null, IProgress<double> progress = null)
         {
             // Get messages
-            var messages = await GetChannelMessagesAsync(token, channel.Id, after, before, progress);
+            IReadOnlyList<Message> messages = await GetChannelMessagesAsync(token, channel.Id, after, before, progress);
 
             // Get mentionables
-            var mentionables = await GetMentionablesAsync(token, guild.Id, messages);
+            Mentionables mentionables = await GetMentionablesAsync(token, guild.Id, messages);
 
             return new ChatLog(guild, channel, after, before, messages, mentionables);
         }
@@ -230,7 +240,7 @@ namespace DiscordChatExporter.Core.Services
             DateTimeOffset? after = null, DateTimeOffset? before = null, IProgress<double> progress = null)
         {
             // Get guild
-            var guild = channel.GuildId == Guild.DirectMessages.Id
+            Guild guild = channel.GuildId == Guild.DirectMessages.Id
                 ? Guild.DirectMessages
                 : await GetGuildAsync(token, channel.GuildId);
 
@@ -242,7 +252,7 @@ namespace DiscordChatExporter.Core.Services
             DateTimeOffset? after = null, DateTimeOffset? before = null, IProgress<double> progress = null)
         {
             // Get channel
-            var channel = await GetChannelAsync(token, channelId);
+            Channel channel = await GetChannelAsync(token, channelId);
 
             // Get the chat log
             return await GetChatLogAsync(token, channel, after, before, progress);
