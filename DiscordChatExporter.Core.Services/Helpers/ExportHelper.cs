@@ -55,5 +55,23 @@ namespace DiscordChatExporter.Core.Services.Helpers
 
             return result.ToString();
         }
+
+        public static string GetDefaultExportFileName(ExportFormat format, string guildId)
+        {
+            var result = new StringBuilder();
+
+            // Append guild and channel names
+            result.Append($"Members - {guildId}");
+
+
+            // Append extension
+            result.Append($".{format.GetFileExtension()}");
+
+            // Replace invalid chars
+            foreach (var invalidChar in Path.GetInvalidFileNameChars())
+                result.Replace(invalidChar, '_');
+
+            return result.ToString();
+        }
     }
 }

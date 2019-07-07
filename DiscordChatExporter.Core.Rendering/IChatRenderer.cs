@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace DiscordChatExporter.Core.Rendering
 {
-    public interface IChatLogRenderer
+    public interface IChatRenderer
     {
         Task RenderAsync(TextWriter writer);
     }

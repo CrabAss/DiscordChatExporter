@@ -11,7 +11,7 @@ using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Core.Rendering
 {
-    public class PlainTextChatLogRenderer : IChatLogRenderer
+    public class PlainTextChatLogRenderer : IChatRenderer
     {
         private readonly ChatLog _chatLog;
         private readonly string _dateFormat;

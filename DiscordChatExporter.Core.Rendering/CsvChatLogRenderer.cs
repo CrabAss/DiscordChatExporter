@@ -11,7 +11,7 @@ using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Core.Rendering
 {
-    public class CsvChatLogRenderer : IChatLogRenderer
+    public class CsvChatLogRenderer : IChatRenderer
     {
         private readonly ChatLog _chatLog;
         private readonly string _dateFormat;
@@ -31,7 +31,7 @@ namespace DiscordChatExporter.Core.Rendering
             if (node is FormattedNode formattedNode)
             {
                 // Recursively get inner text
-                var innerText = FormatMarkdown(formattedNode.Children);
+                string innerText = FormatMarkdown(formattedNode.Children);
 
                 return $"{formattedNode.Token}{innerText}{formattedNode.Token}";
             }
@@ -42,21 +42,21 @@ namespace DiscordChatExporter.Core.Rendering
                 // User mention node
                 if (mentionNode.Type == MentionType.User)
                 {
-                    var user = _chatLog.Mentionables.GetUser(mentionNode.Id);
+                    User user = _chatLog.Mentionables.GetUser(mentionNode.Id);
                     return $"@{user.Name}";
                 }
 
                 // Channel mention node
                 if (mentionNode.Type == MentionType.Channel)
                 {
-                    var channel = _chatLog.Mentionables.GetChannel(mentionNode.Id);
+                    Channel channel = _chatLog.Mentionables.GetChannel(mentionNode.Id);
                     return $"#{channel.Name}";
                 }
 
                 // Role mention node
                 if (mentionNode.Type == MentionType.Role)
                 {
-                    var role = _chatLog.Mentionables.GetRole(mentionNode.Id);
+                    Role role = _chatLog.Mentionables.GetRole(mentionNode.Id);
                     return $"@{role.Name}";
                 }
             }
@@ -77,7 +77,7 @@ namespace DiscordChatExporter.Core.Rendering
 
         private async Task RenderFieldAsync(TextWriter writer, string value)
         {
-            var encodedValue = value.Replace("\"", "\"\"");
+            string encodedValue = value.Replace("\"", "\"\"");
             await writer.WriteAsync($"\"{encodedValue}\";");
         }
 
@@ -93,11 +93,11 @@ namespace DiscordChatExporter.Core.Rendering
             await RenderFieldAsync(writer, FormatMarkdown(message.Content));
 
             // Attachments
-            var formattedAttachments = message.Attachments.Select(a => a.Url).JoinToString(",");
+            string formattedAttachments = message.Attachments.Select(a => a.Url).JoinToString(",");
             await RenderFieldAsync(writer, formattedAttachments);
 
             // Reactions
-            var formattedReactions = message.Reactions.Select(r => r.Emoji.Name + $"({r.Count})").JoinToString(",");
+            string formattedReactions = message.Reactions.Select(r => r.Emoji.Name + $"({r.Count})").JoinToString(",");
             await RenderFieldAsync(writer, formattedReactions);
 
             // Line break
@@ -110,7 +110,7 @@ namespace DiscordChatExporter.Core.Rendering
             await writer.WriteLineAsync("Author;Date;Content;Attachments;Reactions;");
 
             // Log
-            foreach (var message in _chatLog.Messages)
+            foreach (Message message in _chatLog.Messages)
                 await RenderMessageAsync(writer, message);
         }
     }

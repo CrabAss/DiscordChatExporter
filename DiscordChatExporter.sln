@@ -21,6 +21,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordChatExporter.Gui", "DiscordChatExporter.Gui\DiscordChatExporter.Gui.csproj", "{732A67AF-93DE-49DF-B10F-FD74710B7863}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscordChatExporter.Cli", "DiscordChatExporter.Cli\DiscordChatExporter.Cli.csproj", "{D08624B6-3081-4BCB-91F8-E9832FACC6CE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{14D02A08-E820-4012-B805-663B9A3D73E9} = {14D02A08-E820-4012-B805-663B9A3D73E9}
+		{D33F7443-4EEB-4E53-99BE-6045A62FC8C8} = {D33F7443-4EEB-4E53-99BE-6045A62FC8C8}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

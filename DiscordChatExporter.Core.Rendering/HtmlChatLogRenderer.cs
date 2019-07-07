@@ -14,7 +14,7 @@ using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Core.Rendering
 {
-    public partial class HtmlChatLogRenderer : IChatLogRenderer
+    public partial class HtmlChatLogRenderer : IChatRenderer
     {
         private readonly ChatLog _chatLog;
         private readonly string _themeName;

@@ -86,10 +86,37 @@ namespace DiscordChatExporter.Core.Services
         {
             // Special case for direct messages pseudo-guild ...
 
-            JToken response = await GetApiResponseAsync(token, "guilds", $"{guildId}/members");
-            GuildMember[] guildMembers = response.Select(ParseGuildMember).ToArray();
+            List<GuildMember> result = new List<GuildMember>();
 
-            return guildMembers;
+            string offsetId = "0";
+            while (true)
+            {
+                // Get message batch
+                JToken response = await GetApiResponseAsync(token, "guilds", $"{guildId}/members",
+                    "limit=1000", $"after={offsetId}");
+
+                // Parse
+                GuildMember[] guildMembers = response
+                    .Select(ParseGuildMember)
+                    .ToArray();
+
+                // Break if there are no messages (can happen if messages are deleted during execution)
+                if (!guildMembers.Any())
+                    break;
+
+                // Add to result
+                result.AddRange(guildMembers);
+
+                // Break if messages were trimmed (which means the last message was encountered)
+                if (guildMembers.Length != 1000)
+                    break;
+
+                // Move offset
+                offsetId = result.Last().User.Id;
+            }
+
+            return result;
+
         }
 
         public async Task<Channel> GetChannelAsync(AuthToken token, string channelId)

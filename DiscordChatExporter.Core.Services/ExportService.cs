@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace DiscordChatExporter.Core.Services
             _settingsService = settingsService;
         }
 
-        private IChatLogRenderer CreateRenderer(ChatLog chatLog, ExportFormat format)
+        private IChatRenderer CreateRenderer(ChatLog chatLog, ExportFormat format)
         {
             if (format == ExportFormat.PlainText)
                 return new PlainTextChatLogRenderer(chatLog, _settingsService.DateFormat);
@@ -32,6 +33,26 @@ namespace DiscordChatExporter.Core.Services
                 return new CsvChatLogRenderer(chatLog, _settingsService.DateFormat);
 
             throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
+        }
+
+        private IChatRenderer CreateRenderer(IReadOnlyList<GuildMember> guildMembers, ExportFormat format)
+        {
+            if (format == ExportFormat.Csv)
+                return new CsvGuildMemberRenderer(guildMembers, _settingsService.DateFormat);
+
+            throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
+        }
+
+        public async Task ExportGuildMembersAsync(IReadOnlyList<GuildMember> guildMembers, string filePath, ExportFormat format)
+        {
+            // Create output directory
+            var dirPath = Path.GetDirectoryName(filePath);
+            if (!dirPath.IsNullOrWhiteSpace())
+                Directory.CreateDirectory(dirPath);
+
+            // Render chat log to output file
+            using (var writer = File.CreateText(filePath))
+                await CreateRenderer(guildMembers, format).RenderAsync(writer);
         }
 
         private async Task ExportChatLogAsync(ChatLog chatLog, string filePath, ExportFormat format)
