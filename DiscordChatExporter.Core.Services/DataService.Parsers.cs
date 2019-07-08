@@ -211,7 +211,7 @@ namespace DiscordChatExporter.Core.Services
 
             User user = ParseUser(json["user"]);
             string nick = json["nick"]?.Value<string>();
-            Role[] roles = json["roles"].EmptyIfNull().Select(ParseRole).ToArray();
+            string[] roles = json["roles"].ToObject<string[]>();
             DateTimeOffset joinedAt = json["joined_at"].Value<DateTime>().ToDateTimeOffset();
             DateTimeOffset? premiumSince = json["premium_since"]?.Value<DateTime?>()?.ToDateTimeOffset();
             bool isDeaf = json["deaf"]?.Value<bool>() ?? false;

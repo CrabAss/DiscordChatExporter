@@ -35,14 +35,14 @@ namespace DiscordChatExporter.Core.Rendering
             await writer.WriteAsync(value == true ? "true;" : "false;");
         }
 
-        private async Task RenderRolesAsync(TextWriter writer, IReadOnlyList<Role> roles)
+        private async Task RenderRolesAsync(TextWriter writer, IReadOnlyList<string> roles)
         {
             // TO BE IMPROVED
 
             await writer.WriteAsync("\"");
-            foreach (Role role in roles)
+            foreach (string role in roles)
             {
-                await writer.WriteAsync($"{role.Name} ({role.Id}), ");
+                await writer.WriteAsync($"{role}, ");
             }
             await writer.WriteAsync("\";");
         }
@@ -62,7 +62,7 @@ namespace DiscordChatExporter.Core.Rendering
             await RenderFieldAsync(writer, guildMember.User.AvatarUrl);
 
             // User Nickname in guild
-            await RenderFieldAsync(writer, guildMember.Nickname);
+            await RenderFieldAsync(writer, guildMember.Nickname ?? "");
 
             // User Roles
             await RenderRolesAsync(writer, guildMember.Roles);
@@ -71,7 +71,7 @@ namespace DiscordChatExporter.Core.Rendering
             await RenderFieldAsync(writer, FormatDate(guildMember.JoinedAt));
 
             // premium since
-            await RenderFieldAsync(writer, FormatDate(guildMember.PremiumSince));
+            await RenderFieldAsync(writer, guildMember.PremiumSince == null ? "" : FormatDate(guildMember.PremiumSince));
 
             // User is deaf?
             await RenderBoolAsync(writer, guildMember.IsDeaf);

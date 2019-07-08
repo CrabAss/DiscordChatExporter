@@ -12,7 +12,7 @@ namespace DiscordChatExporter.Core.Models
 
         public string Nickname { get; }
 
-        public IReadOnlyList<Role> Roles { get; }
+        public IReadOnlyList<string> Roles { get; }
 
         public DateTimeOffset JoinedAt { get; }
 
@@ -22,7 +22,7 @@ namespace DiscordChatExporter.Core.Models
 
         public bool IsMute { get; }
 
-        public GuildMember(User user, string nickname, IReadOnlyList<Role> roles, DateTimeOffset joinedAt,
+        public GuildMember(User user, string nickname, IReadOnlyList<string> roles, DateTimeOffset joinedAt,
             DateTimeOffset? premiumSince, bool isDeaf, bool isMute)
         {
             User = user;

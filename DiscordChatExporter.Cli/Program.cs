@@ -48,6 +48,7 @@ namespace DiscordChatExporter.Cli
                 typeof(ExportChannelOptions),
                 typeof(ExportDirectMessagesOptions),
                 typeof(ExportGuildOptions),
+                typeof(ExportGuildMembersOptions),
                 typeof(GetChannelsOptions),
                 typeof(GetDirectMessageChannelsOptions),
                 typeof(GetGuildsOptions)
