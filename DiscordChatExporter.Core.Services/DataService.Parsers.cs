@@ -59,8 +59,14 @@ namespace DiscordChatExporter.Core.Services
         {
             string id = json["id"].Value<string>();
             string name = json["name"].Value<string>();
+            uint color = json["color"].Value<uint>();
+            bool isHoisted = json["hoist"]?.Value<bool>() ?? false;
+            uint position = json["position"].Value<uint>();
+            ulong permissions = json["permissions"].Value<ulong>();
+            bool isManaged = json["managed"]?.Value<bool>() ?? false;
+            bool isMentionable = json["mentionable"]?.Value<bool>() ?? false;
 
-            return new Role(id, name);
+            return new Role(id, name, color, isHoisted, position, permissions, isManaged, isMentionable);
         }
 
         private Attachment ParseAttachment(JToken json)

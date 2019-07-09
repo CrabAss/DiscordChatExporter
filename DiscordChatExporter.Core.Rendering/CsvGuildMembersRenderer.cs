@@ -3,19 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DiscordChatExporter.Core.Rendering
 {
-    public class CsvGuildMemberRenderer : IChatRenderer
+    public class CsvGuildMembersRenderer : IChatRenderer
     {
 
         private readonly IReadOnlyList<GuildMember> _guildMembers;
         private readonly string _dateFormat;
 
-        public CsvGuildMemberRenderer(IReadOnlyList<GuildMember> guildMembers, string dateFormat)
+        public CsvGuildMembersRenderer(IReadOnlyList<GuildMember> guildMembers, string dateFormat)
         {
             _guildMembers = guildMembers;
             _dateFormat = dateFormat;
@@ -37,14 +35,7 @@ namespace DiscordChatExporter.Core.Rendering
 
         private async Task RenderRolesAsync(TextWriter writer, IReadOnlyList<string> roles)
         {
-            // TO BE IMPROVED
-
-            await writer.WriteAsync("\"");
-            foreach (string role in roles)
-            {
-                await writer.WriteAsync($"{role}, ");
-            }
-            await writer.WriteAsync("\";");
+            await writer.WriteAsync($"\"{string.Join(", ", roles)}\";");
         }
 
         private async Task RenderGuildMemberAsync(TextWriter writer, GuildMember guildMember)

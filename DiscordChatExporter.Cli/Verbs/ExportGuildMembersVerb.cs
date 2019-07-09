@@ -43,13 +43,21 @@ namespace DiscordChatExporter.Cli.Verbs
                 guildMembers = guildMembers.OrderBy(c => c.User.Id).ToArray();
 
                 // Generate default file name
-                var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, Options.GuildId);
+                var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, "Members", Options.GuildId);
 
                 // Generate file path
                 var filePath = Path.Combine(Options.OutputPath ?? "", fileName);
 
                 // Export
                 await exportService.ExportGuildMembersAsync(guildMembers, filePath, Options.ExportFormat);
+
+
+                IReadOnlyList<Role> roles = await dataService.GetGuildRolesAsync(Options.GetToken(), Options.GuildId);
+                roles = roles.OrderBy(c => c.Position).ToArray();
+                fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, "Roles", Options.GuildId);
+                filePath = Path.Combine(Options.OutputPath ?? "", fileName);
+                await exportService.ExportGuildRolesAsync(roles, filePath, Options.ExportFormat);
+
             }
             catch (HttpErrorStatusCodeException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
             {
