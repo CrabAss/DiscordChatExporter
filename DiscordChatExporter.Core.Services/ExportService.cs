@@ -51,6 +51,14 @@ namespace DiscordChatExporter.Core.Services
             throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
         }
 
+        private IChatRenderer CreateRenderer(IReadOnlyList<Channel> channels, ExportFormat format)
+        {
+            if (format == ExportFormat.Csv)
+                return new CsvGuildChannelsRenderer(channels, _settingsService.DateFormat);
+
+            throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
+        }
+
         public async Task ExportGuildMembersAsync(IReadOnlyList<GuildMember> guildMembers, string filePath, ExportFormat format)
         {
             // Create output directory
@@ -73,6 +81,18 @@ namespace DiscordChatExporter.Core.Services
             // Render chat log to output file
             using (var writer = File.CreateText(filePath))
                 await CreateRenderer(roles, format).RenderAsync(writer);
+        }
+
+        public async Task ExportGuildChannelsAsync(IReadOnlyList<Channel> channels, string filePath, ExportFormat format)
+        {
+            // Create output directory
+            var dirPath = Path.GetDirectoryName(filePath);
+            if (!dirPath.IsNullOrWhiteSpace())
+                Directory.CreateDirectory(dirPath);
+
+            // Render chat log to output file
+            using (var writer = File.CreateText(filePath))
+                await CreateRenderer(channels, format).RenderAsync(writer);
         }
 
         private async Task ExportChatLogAsync(ChatLog chatLog, string filePath, ExportFormat format)

@@ -52,7 +52,19 @@ namespace DiscordChatExporter.Core.Services
             if (name.IsNullOrWhiteSpace())
                 name = json["recipients"].Select(ParseUser).Select(u => u.Name).JoinToString(", ");
 
-            return new Channel(id, parentId, guildId, name, topic, type);
+            PermissionOverwrite[] overwrites = json["permission_overwrites"]?.Select(ParseOverwrite).ToArray();
+
+            return new Channel(id, parentId, guildId, name, topic, type, overwrites);
+        }
+
+        private PermissionOverwrite ParseOverwrite(JToken json)
+        {
+            string id = json["id"].Value<string>();
+            string type = json["type"].Value<string>();
+            ulong allow = json["allow"].Value<ulong>();
+            ulong deny = json["deny"].Value<ulong>();
+
+            return new PermissionOverwrite(id, type, allow, deny);
         }
 
         private Role ParseRole(JToken json)

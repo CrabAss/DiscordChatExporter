@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -31,8 +32,35 @@ namespace DiscordChatExporter.Cli.Verbs
             if (!Options.DateFormat.IsNullOrWhiteSpace())
                 settingsService.DateFormat = Options.DateFormat;
 
-            // Get channels
-            var channels = await dataService.GetGuildChannelsAsync(Options.GetToken(), Options.GuildId);
+            IReadOnlyList<Channel> channels;
+            Guild guild;
+            Console.Write("Exporting channel metadata... ");
+
+            using (var progress = new InlineProgress())
+            {
+                guild = await dataService.GetGuildAsync(Options.GetToken(), Options.GuildId);
+
+                // Get channels
+                channels = await dataService.GetGuildChannelsAsync(Options.GetToken(), Options.GuildId);
+
+                // Filter and order channels
+                channels = channels
+                    .OrderBy(c => Enum.GetName(typeof(ChannelType), c.Type))
+                    .OrderBy(c => c.ParentId)
+                    .ToArray();
+
+                // Generate default file name
+                var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, "!CHANNELS!", guild.Name);
+
+                // Generate file path
+                var filePath = Path.Combine(Options.OutputPath ?? "", fileName);
+
+                // Export
+                await exportService.ExportGuildChannelsAsync(channels, filePath, Options.ExportFormat);
+
+                progress.ReportCompletion();
+            }
+
 
             // Filter and order channels
             channels = channels.Where(c => c.Type == ChannelType.GuildTextChat).OrderBy(c => c.Name).ToArray();
@@ -51,7 +79,7 @@ namespace DiscordChatExporter.Cli.Verbs
                             Options.After, Options.Before, progress);
 
                         // Generate default file name
-                        var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, chatLog.Guild,
+                        var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, guild,
                             chatLog.Channel, Options.After, Options.Before);
 
                         // Generate file path

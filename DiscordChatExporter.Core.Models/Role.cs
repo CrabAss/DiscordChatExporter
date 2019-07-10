@@ -17,27 +17,24 @@ namespace DiscordChatExporter.Core.Models
 
         public uint Position { get; }
 
-        public ulong Permissions { get; }
-
-        public HashSet<PermissionType> PermissionSet { get; }
+        public Permissions PermissionSet { get; }
         
         public bool IsManaged { get; }
 
         public bool IsMentionable { get; }
 
         public Role(string id, string name, uint color, bool isHoisted, uint position, 
-            ulong permissions, bool isManaged, bool isMentionable)
+            ulong permissionBitSet, bool isManaged, bool isMentionable)
         {
             Id = id;
             Name = name;
             Color = color;
             IsHoisted = isHoisted;
             Position = position;
-            Permissions = permissions;
             IsManaged = isManaged;
             IsMentionable = isMentionable;
 
-            PermissionSet = ParsePermissionInt(permissions);
+            PermissionSet = new Permissions(permissionBitSet);
         }
 
         public Role(string id, string name)
@@ -52,17 +49,5 @@ namespace DiscordChatExporter.Core.Models
     public partial class Role
     {
         public static Role CreateDeletedRole(string id) => new Role(id, "deleted-role");
-
-        public static HashSet<PermissionType> ParsePermissionInt(ulong permissions)
-        {
-            HashSet<PermissionType> permissionSet = new HashSet<PermissionType>();
-            foreach (PermissionType permissionType in Enum.GetValues(typeof(PermissionType)))
-            {
-                ulong permissionTypeValue = Convert.ToUInt64(permissionType);
-                if ((permissions & permissionTypeValue) == permissionTypeValue)
-                    permissionSet.Add(permissionType);
-            }
-            return permissionSet;
-        }
     }
 }

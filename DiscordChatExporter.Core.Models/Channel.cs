@@ -16,7 +16,9 @@
 
         public ChannelType Type { get; }
 
-        public Channel(string id, string parentId, string guildId, string name, string topic, ChannelType type)
+        public PermissionOverwrite[] Overwrites { get; }
+
+        public Channel(string id, string parentId, string guildId, string name, string topic, ChannelType type, PermissionOverwrite[] overwrites)
         {
             Id = id;
             ParentId = parentId;
@@ -24,6 +26,7 @@
             Name = name;
             Topic = topic;
             Type = type;
+            Overwrites = overwrites;
         }
 
         public override string ToString() => Name;
@@ -32,6 +35,6 @@
     public partial class Channel
     {
         public static Channel CreateDeletedChannel(string id) =>
-            new Channel(id, null, null, "deleted-channel", null, ChannelType.GuildTextChat);
+            new Channel(id, null, null, "deleted-channel", null, ChannelType.GuildTextChat, null);
     }
 }

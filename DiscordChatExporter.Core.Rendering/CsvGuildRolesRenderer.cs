@@ -20,16 +20,6 @@ namespace DiscordChatExporter.Core.Rendering
             _dateFormat = dateFormat;
         }
 
-        private async Task RenderPermissionSetAsync(TextWriter writer, HashSet<PermissionType> permissionSet)
-        {
-            string[] permissions = permissionSet
-                .Select(x => Enum.GetName(typeof(PermissionType), x))
-                .OrderBy(x => x)
-                .ToArray();
-            string result = string.Join(", ", permissions);
-            await RenderFieldAsync(writer, result);
-        }
-
         private async Task RenderFieldAsync(TextWriter writer, string value)
         {
             var encodedValue = value.Replace("\"", "\"\"");
@@ -59,7 +49,7 @@ namespace DiscordChatExporter.Core.Rendering
             await RenderFieldAsync(writer, role.Position.ToString());
 
             // Role PermissionSet
-            await RenderPermissionSetAsync(writer, role.PermissionSet);
+            await RenderFieldAsync(writer, role.PermissionSet.ToString());
 
             // Role is managed?
             await RenderBoolAsync(writer, role.IsManaged);
