@@ -58,7 +58,8 @@ namespace DiscordChatExporter.Core.Models
             HashSet<PermissionType> permissionSet = new HashSet<PermissionType>();
             foreach (PermissionType permissionType in Enum.GetValues(typeof(PermissionType)))
             {
-                if ((permissions & Convert.ToUInt64(permissionType)) == Convert.ToUInt64(permissionType))
+                ulong permissionTypeValue = Convert.ToUInt64(permissionType);
+                if ((permissions & permissionTypeValue) == permissionTypeValue)
                     permissionSet.Add(permissionType);
             }
             return permissionSet;

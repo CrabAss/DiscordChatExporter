@@ -2,6 +2,8 @@
 {
     public enum PermissionType
     {
+        // https://discordapp.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags
+
         CREATE_INSTANT_INVITE = 0x00000001,
         KICK_MEMBERS = 0x00000002,
         BAN_MEMBERS = 0x00000004,

@@ -36,14 +36,16 @@ namespace DiscordChatExporter.Cli.Verbs
             {
                 Console.Write($"Exporting guild [{Options.GuildId}]... ");
 
-                // Get guild members
-                IReadOnlyList<GuildMember> guildMembers = await dataService.GetGuildMembersAsync(Options.GetToken(), Options.GuildId);
+                Guild guild = await dataService.GetGuildAsync(Options.GetToken(), Options.GuildId);
 
-                // Filter and order channels
-                guildMembers = guildMembers.OrderBy(c => c.User.Id).ToArray();
+                // Get guild members
+                IReadOnlyList<GuildMember> guildMembers = await dataService.GetGuildMembersAsync(Options.GetToken(), guild.Id);
+
+                // Order guild members by date of join in descending order
+                guildMembers = guildMembers.OrderByDescending(c => c.JoinedAt).ToArray();
 
                 // Generate default file name
-                var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, "Members", Options.GuildId);
+                var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, "!MEMBERS!", guild.Name);
 
                 // Generate file path
                 var filePath = Path.Combine(Options.OutputPath ?? "", fileName);
@@ -52,9 +54,13 @@ namespace DiscordChatExporter.Cli.Verbs
                 await exportService.ExportGuildMembersAsync(guildMembers, filePath, Options.ExportFormat);
 
 
-                IReadOnlyList<Role> roles = await dataService.GetGuildRolesAsync(Options.GetToken(), Options.GuildId);
-                roles = roles.OrderBy(c => c.Position).ToArray();
-                fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, "Roles", Options.GuildId);
+                // Get guild roles
+                IReadOnlyList<Role> roles = await dataService.GetGuildRolesAsync(Options.GetToken(), guild.Id);
+
+                // Order guild roles by position in descending order (Highest position goes first)
+                roles = roles.OrderByDescending(c => c.Position).ToArray();
+
+                fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, "!ROLES!", guild.Name);
                 filePath = Path.Combine(Options.OutputPath ?? "", fileName);
                 await exportService.ExportGuildRolesAsync(roles, filePath, Options.ExportFormat);
 

@@ -56,12 +56,12 @@ namespace DiscordChatExporter.Core.Services.Helpers
             return result.ToString();
         }
 
-        public static string GetDefaultExportFileName(ExportFormat format, string prefix, string guildId)
+        public static string GetDefaultExportFileName(ExportFormat format, string remark, string guildId)
         {
             var result = new StringBuilder();
 
             // Append guild and channel names
-            result.Append($"{prefix} - {guildId}");
+            result.Append($"{guildId} - {remark}");
 
 
             // Append extension
