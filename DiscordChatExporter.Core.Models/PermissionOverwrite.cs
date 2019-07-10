@@ -29,7 +29,7 @@ namespace DiscordChatExporter.Core.Models
 
         public override string ToString()
         {
-            return $"{{\"{Id}\", \"{Enum.GetName(typeof(PermissionOverwriteType), Type)}\", \"{Allow.ToString()}\", \"{Deny.ToString()}\"}}";
+            return $"{{'Id': '{Id}', 'Type': '{Enum.GetName(typeof(PermissionOverwriteType), Type)}', 'Allow': '{Allow.ToString()}', 'Deny': '{Deny.ToString()}'}}";
         }
     }
 }
