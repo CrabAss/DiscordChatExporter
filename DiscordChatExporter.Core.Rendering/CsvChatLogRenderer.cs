@@ -83,7 +83,13 @@ namespace DiscordChatExporter.Core.Rendering
 
         private async Task RenderMessageAsync(TextWriter writer, Message message)
         {
-            // Author
+            // Message ID
+            await RenderFieldAsync(writer, message.Id);
+
+            // Author ID
+            await RenderFieldAsync(writer, message.Author.Id);
+
+            // Author Name
             await RenderFieldAsync(writer, message.Author.FullName);
 
             // Timestamp
@@ -107,7 +113,7 @@ namespace DiscordChatExporter.Core.Rendering
         public async Task RenderAsync(TextWriter writer)
         {
             // Headers
-            await writer.WriteLineAsync("Author;Date;Content;Attachments;Reactions;");
+            await writer.WriteLineAsync("MessageID;AuthorID;AuthorName;Date;Content;Attachments;Reactions;");
 
             // Log
             foreach (Message message in _chatLog.Messages)
