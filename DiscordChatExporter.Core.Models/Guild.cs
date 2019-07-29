@@ -14,11 +14,26 @@ namespace DiscordChatExporter.Core.Models
 
         public string IconUrl { get; }
 
-        public Guild(string id, string name, string iconHash)
+        public string OwnerId { get; }
+
+        public uint VerificationLevel { get; }
+
+        public string Description { get; }
+
+        public Guild(string id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+
+        public Guild(string id, string name, string iconHash, string ownerId, uint verificationLevel, string description)
         {
             Id = id;
             Name = name;
             IconHash = iconHash;
+            OwnerId = ownerId;
+            VerificationLevel = verificationLevel;
+            Description = description ?? "";
 
             IconUrl = GetIconUrl(id, iconHash);
         }
@@ -35,6 +50,6 @@ namespace DiscordChatExporter.Core.Models
                 : "https://cdn.discordapp.com/embed/avatars/0.png";
         }
 
-        public static Guild DirectMessages { get; } = new Guild("@me", "Direct Messages", null);
+        public static Guild DirectMessages { get; } = new Guild("@me", "Direct Messages");
     }
 }

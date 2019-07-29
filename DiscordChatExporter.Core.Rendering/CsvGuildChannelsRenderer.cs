@@ -27,30 +27,27 @@ namespace DiscordChatExporter.Core.Rendering
         private async Task RenderOverwriteAsync(TextWriter writer, PermissionOverwrite[] overwrites)
         {
             string[] overwriteStrings = overwrites.Select(x => x.ToString()).ToArray();
-            await writer.WriteAsync($"\"{string.Join(", ", overwriteStrings)}\";");
+            await writer.WriteAsync($"[{string.Join(", ", overwriteStrings)}];");
         }
 
         private async Task RenderGuildChannelAsync(TextWriter writer, Channel channel)
         {
-            // User ID
+            // Channel ID
             await RenderFieldAsync(writer, channel.Id);
 
-            // User FullName
+            // Channel's Parent ID
             await RenderFieldAsync(writer, channel.ParentId ?? "");
 
-            // User is bot?
-            await RenderFieldAsync(writer, channel.GuildId);
+            // Channel Type
+            await RenderFieldAsync(writer, ((int) channel.Type).ToString());
 
-            // User avatar URL
-            await RenderFieldAsync(writer, Enum.GetName(typeof(ChannelType), channel.Type));
-
-            // User Nickname in guild
+            // Channel Name
             await RenderFieldAsync(writer, channel.Name);
 
-            // User Roles
+            // Channel Topics
             await RenderFieldAsync(writer, channel.Topic ?? "");
 
-            // when did the user join this guild
+            // Channel Overwrites
             await RenderOverwriteAsync(writer, channel.Overwrites);
 
             // Line break
@@ -60,7 +57,7 @@ namespace DiscordChatExporter.Core.Rendering
         public async Task RenderAsync(TextWriter writer)
         {
             // Headers
-            await writer.WriteLineAsync("ID;ParentId;GuildId;Type;Name;Topic;PermissionOverwrites;");
+            await writer.WriteLineAsync("ID;ParentId;Type;Name;Topic;Overwrites;");
 
             // Log
             foreach (Channel channel in _channels)

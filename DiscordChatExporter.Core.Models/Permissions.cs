@@ -19,7 +19,8 @@ namespace DiscordChatExporter.Core.Models
 
         public override string ToString()
         {
-            return string.Join(", ", ToStringArray());
+            //return string.Join(", ", ToStringArray());
+            return RawBitSet.ToString();
         }
     }
 

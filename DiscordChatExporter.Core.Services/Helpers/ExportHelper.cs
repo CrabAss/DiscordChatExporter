@@ -14,13 +14,17 @@ namespace DiscordChatExporter.Core.Services.Helpers
             path.Last() == Path.AltDirectorySeparatorChar ||
             (Path.GetExtension(path).IsNullOrWhiteSpace() && !File.Exists(path));
 
-        public static string GetDefaultExportFileName(ExportFormat format, Guild guild, Channel channel,
+        public static string GetDefaultExportFileName(ExportFormat format, Guild guild, Channel channel = null,
             DateTimeOffset? after = null, DateTimeOffset? before = null)
         {
             var result = new StringBuilder();
 
             // Append guild and channel names
-            result.Append($"{guild.Name} - {channel.Name} [{channel.Id}]");
+            result.Append($"{guild.Id}");
+            if (channel != null)
+                result.Append($" - {channel.Name} [{channel.Id}]");
+            else
+                result.Append(" - Message");
 
             // Append date range
             if (after != null || before != null)
@@ -56,12 +60,12 @@ namespace DiscordChatExporter.Core.Services.Helpers
             return result.ToString();
         }
 
-        public static string GetDefaultExportFileName(ExportFormat format, string remark, string guildName)
+        public static string GetDefaultExportFileName(ExportFormat format, Guild guild, string remark)
         {
             var result = new StringBuilder();
 
             // Append guild and channel names
-            result.Append($"{guildName} - {remark}");
+            result.Append($"{guild.Id} - {remark}");
 
 
             // Append extension

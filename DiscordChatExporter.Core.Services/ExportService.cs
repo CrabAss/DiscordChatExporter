@@ -35,6 +35,14 @@ namespace DiscordChatExporter.Core.Services
             throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
         }
 
+        private IChatRenderer CreateRenderer(IReadOnlyList<ChatLog> chatLogs, ExportFormat format)
+        {
+            if (format == ExportFormat.Csv)
+                return new CsvBundledChatLogRenderer(chatLogs, _settingsService.DateFormat);
+
+            throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
+        }
+
         private IChatRenderer CreateRenderer(IReadOnlyList<GuildMember> guildMembers, ExportFormat format)
         {
             if (format == ExportFormat.Csv)
@@ -55,6 +63,14 @@ namespace DiscordChatExporter.Core.Services
         {
             if (format == ExportFormat.Csv)
                 return new CsvGuildChannelsRenderer(channels, _settingsService.DateFormat);
+
+            throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
+        }
+
+        private IChatRenderer CreateRenderer(Guild guild, ExportFormat format)
+        {
+            if (format == ExportFormat.Csv)
+                return new CsvGuildRenderer(guild, _settingsService.DateFormat);
 
             throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
         }
@@ -95,6 +111,31 @@ namespace DiscordChatExporter.Core.Services
                 await CreateRenderer(channels, format).RenderAsync(writer);
         }
 
+        public async Task ExportGuildAsync(Guild guild, string filePath, ExportFormat format)
+        {
+            // Create output directory
+            var dirPath = Path.GetDirectoryName(filePath);
+            if (!dirPath.IsNullOrWhiteSpace())
+                Directory.CreateDirectory(dirPath);
+
+            // Render chat log to output file
+            using (var writer = File.CreateText(filePath))
+                await CreateRenderer(guild, format).RenderAsync(writer);
+        }
+
+        public async Task ExportChatLogAsync(IReadOnlyList<ChatLog> chatLogs, string filePath, ExportFormat format)
+        {
+            // Create output directory
+            var dirPath = Path.GetDirectoryName(filePath);
+            if (!dirPath.IsNullOrWhiteSpace())
+                Directory.CreateDirectory(dirPath);
+
+            // Render chat log to output file
+            File.Delete(filePath);
+            using (var writer = File.AppendText(filePath))
+                await CreateRenderer(chatLogs, format).RenderAsync(writer);
+        }
+
         private async Task ExportChatLogAsync(ChatLog chatLog, string filePath, ExportFormat format)
         {
             // Create output directory
@@ -129,7 +170,7 @@ namespace DiscordChatExporter.Core.Services
 
                 // Export each partition separately
                 var partitionNumber = 1;
-                foreach (var partition in partitions)
+                foreach (ChatLog partition in partitions)
                 {
                     // Compose new file name
                     var partitionFilePath = $"{fileNameWithoutExt} [{partitionNumber} of {partitions.Length}]{fileExt}";

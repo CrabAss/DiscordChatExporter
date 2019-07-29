@@ -8,6 +8,8 @@
         DirectTextChat,
         GuildVoiceChat,
         DirectGroupTextChat,
-        Category
+        Category,
+        News,
+        Store
     }
 }

@@ -26,10 +26,7 @@ namespace DiscordChatExporter.Core.Rendering
             await writer.WriteAsync($"\"{encodedValue}\";");
         }
 
-        private async Task RenderBoolAsync(TextWriter writer, bool value)
-        {
-            await writer.WriteAsync(value == true ? "true;" : "false;");
-        }
+        private async Task RenderBoolAsync(TextWriter writer, bool value) => await writer.WriteAsync($"{value.ToString().ToLower()};");
 
         private async Task RenderGuildRoleAsync(TextWriter writer, Role role)
         {
@@ -42,14 +39,14 @@ namespace DiscordChatExporter.Core.Rendering
             // Role Color
             await RenderFieldAsync(writer, $"#{role.Color.ToString("X6")}");
 
-            // Role is hoisted?
-            await RenderBoolAsync(writer, role.IsHoisted);
-
             // Role Position
             await RenderFieldAsync(writer, role.Position.ToString());
 
             // Role PermissionSet
             await RenderFieldAsync(writer, role.PermissionSet.ToString());
+
+            // Role is hoisted?
+            await RenderBoolAsync(writer, role.IsHoisted);
 
             // Role is managed?
             await RenderBoolAsync(writer, role.IsManaged);
@@ -64,7 +61,7 @@ namespace DiscordChatExporter.Core.Rendering
         public async Task RenderAsync(TextWriter writer)
         {
             // Headers
-            await writer.WriteLineAsync("ID;Name;Color;IsHoisted;Position;Permissions;IsManaged;IsMentionable;");
+            await writer.WriteLineAsync("ID;Name;Color;Position;Permissions;IsHoisted;IsManaged;IsMentionable;");
 
             // Log
             foreach (Role role in _roles)

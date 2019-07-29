@@ -7,5 +7,8 @@ namespace DiscordChatExporter.Cli.Verbs.Options
     {
         [Option('g', "guild", Required = true, HelpText = "Guild ID.")]
         public string GuildId { get; set; }
+
+        [Option("bundled", HelpText = "If you want all chatlogs to be in a single file.")]
+        public bool IsBundled { get; set; }
     }
 }

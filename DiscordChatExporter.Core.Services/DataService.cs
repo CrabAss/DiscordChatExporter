@@ -216,6 +216,7 @@ namespace DiscordChatExporter.Core.Services
 
             // Add last message
             result.Add(lastMessage);
+            //result.RemoveAll(x => x == null);   // remove null messages (BUG?)
 
             // Report progress
             progress?.Report(1);

@@ -26,8 +26,12 @@ namespace DiscordChatExporter.Core.Services
             string id = json["id"].Value<string>();
             string name = json["name"].Value<string>();
             string iconHash = json["icon"].Value<string>();
+            string ownerId = json["owner_id"].Value<string>();
+            uint verificationLevel = json["verification_level"].Value<uint>();
+            string description = json["description"]?.Value<string>();
 
-            return new Guild(id, name, iconHash);
+
+            return new Guild(id, name, iconHash, ownerId, verificationLevel, description);
         }
 
         private Channel ParseChannel(JToken json)

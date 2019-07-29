@@ -16,32 +16,48 @@ namespace DiscordChatExporter.Cli.Verbs
 {
     public class ExportGuildVerb : Verb<ExportGuildOptions>
     {
+
+        // Get services
+        SettingsService settingsService = Container.Instance.Get<SettingsService>();
+        DataService dataService = Container.Instance.Get<DataService>();
+        ExportService exportService = Container.Instance.Get<ExportService>();
+
+        Guild guild;
+        IReadOnlyList<Channel> channels;
+
+
         public ExportGuildVerb(ExportGuildOptions options)
             : base(options)
         {
         }
 
-        public override async Task ExecuteAsync()
+        private async Task ExportGuildMetadata()
         {
-            // Get services
-            var settingsService = Container.Instance.Get<SettingsService>();
-            var dataService = Container.Instance.Get<DataService>();
-            var exportService = Container.Instance.Get<ExportService>();
+            Console.Write("Exporting guild metadata... ");
 
-            // Configure settings
-            if (!Options.DateFormat.IsNullOrWhiteSpace())
-                settingsService.DateFormat = Options.DateFormat;
+            using (InlineProgress progress = new InlineProgress())
+            {
 
-            IReadOnlyList<Channel> channels;
-            Guild guild;
+                // Generate default file name
+                string fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, guild, "Guild");
+
+                // Generate file path
+                string filePath = Path.Combine(Options.OutputPath ?? "", fileName);
+
+                // Export
+                await exportService.ExportGuildAsync(guild, filePath, Options.ExportFormat);
+
+                progress.ReportCompletion();
+            }
+        }
+
+        private async Task ExportChannelMetadata()
+        {
             Console.Write("Exporting channel metadata... ");
 
-            using (var progress = new InlineProgress())
+            using (InlineProgress progress = new InlineProgress())
             {
-                guild = await dataService.GetGuildAsync(Options.GetToken(), Options.GuildId);
-
                 // Get channels
-                channels = await dataService.GetGuildChannelsAsync(Options.GetToken(), Options.GuildId);
 
                 // Filter and order channels
                 channels = channels
@@ -50,43 +66,47 @@ namespace DiscordChatExporter.Cli.Verbs
                     .ToArray();
 
                 // Generate default file name
-                var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, "!CHANNELS!", guild.Name);
+                string fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, guild, "Channel");
 
                 // Generate file path
-                var filePath = Path.Combine(Options.OutputPath ?? "", fileName);
+                string filePath = Path.Combine(Options.OutputPath ?? "", fileName);
 
                 // Export
                 await exportService.ExportGuildChannelsAsync(channels, filePath, Options.ExportFormat);
 
                 progress.ReportCompletion();
             }
+        }
 
-
+        private async Task ExportGuildChatLogs()
+        {
             // Filter and order channels
-            channels = channels.Where(c => c.Type == ChannelType.GuildTextChat).OrderBy(c => c.Name).ToArray();
+            channels = channels.Where(c => c.Type == ChannelType.GuildTextChat || c.Type == ChannelType.News).OrderBy(c => c.Name).ToArray();
+
+            ChatLog[] chatLogs = new ChatLog[channels.Count];
 
             // Loop through channels
-            foreach (var channel in channels)
+            for (int i = 0; i < channels.Count; i++)
             {
                 try
                 {
                     // Track progress
-                    Console.Write($"Exporting channel [{channel.Name}]... ");
-                    using (var progress = new InlineProgress())
+                    Console.Write($"Exporting channel [{channels[i].Name}]... ");
+                    using (InlineProgress progress = new InlineProgress())
                     {
                         // Get chat log
-                        var chatLog = await dataService.GetChatLogAsync(Options.GetToken(), channel,
+                        chatLogs[i] = await dataService.GetChatLogAsync(Options.GetToken(), channels[i],
                             Options.After, Options.Before, progress);
 
                         // Generate default file name
-                        var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, guild,
-                            chatLog.Channel, Options.After, Options.Before);
+                        string fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, guild,
+                            chatLogs[i].Channel, Options.After, Options.Before);
 
                         // Generate file path
-                        var filePath = Path.Combine(Options.OutputPath ?? "", fileName);
+                        string filePath = Path.Combine(Options.OutputPath ?? "", fileName);
 
                         // Export
-                        await exportService.ExportChatLogAsync(chatLog, filePath, Options.ExportFormat,
+                        await exportService.ExportChatLogAsync(chatLogs[i], filePath, Options.ExportFormat,
                             Options.PartitionLimit);
 
                         // Report successful completion
@@ -102,6 +122,72 @@ namespace DiscordChatExporter.Cli.Verbs
                     Console.Error.WriteLine("This channel doesn't exist");
                 }
             }
+        }
+
+        private async Task ExportBundledGuildChatLog()
+        {
+            // Filter and order channels
+            channels = channels.Where(c => c.Type == ChannelType.GuildTextChat || c.Type == ChannelType.News).OrderBy(c => c.Name).ToArray();
+
+            ChatLog[] chatLogs = new ChatLog[channels.Count];
+
+            // Loop through channels
+            for (int i = 0; i < channels.Count; i++)
+            {
+                try
+                {
+                    // Track progress
+                    Console.Write($"Exporting channel [{channels[i].Name}]... ");
+                    using (InlineProgress progress = new InlineProgress())
+                    {
+                        // Get chat log
+                        chatLogs[i] = await dataService.GetChatLogAsync(Options.GetToken(), channels[i],
+                            Options.After, Options.Before, progress);
+
+                        // Report successful completion
+                        progress.ReportCompletion();
+                    }
+                }
+                catch (HttpErrorStatusCodeException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    Console.Error.WriteLine("You don't have access to this channel");
+                }
+                catch (HttpErrorStatusCodeException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+                {
+                    Console.Error.WriteLine("This channel doesn't exist");
+                }
+            }
+
+            // Generate default file name
+            string fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, guild,
+                null, Options.After, Options.Before);
+
+            // Generate file path
+            string filePath = Path.Combine(Options.OutputPath ?? "", fileName);
+
+            // Export
+            await exportService.ExportChatLogAsync(chatLogs, filePath, Options.ExportFormat);
+
+
+        }
+
+        public override async Task ExecuteAsync()
+        {
+
+            // Configure settings
+            if (!Options.DateFormat.IsNullOrWhiteSpace())
+                settingsService.DateFormat = Options.DateFormat;
+
+            guild = await dataService.GetGuildAsync(Options.GetToken(), Options.GuildId);
+            channels = await dataService.GetGuildChannelsAsync(Options.GetToken(), Options.GuildId);
+
+            await ExportGuildMetadata();
+            await ExportChannelMetadata();
+            if (Options.IsBundled)
+                await ExportBundledGuildChatLog();
+            else
+                await ExportGuildChatLogs();
+            
         }
     }
 }

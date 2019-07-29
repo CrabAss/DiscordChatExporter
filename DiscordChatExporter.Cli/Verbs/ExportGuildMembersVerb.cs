@@ -48,7 +48,7 @@ namespace DiscordChatExporter.Cli.Verbs
                     guildMembers = guildMembers.OrderByDescending(c => c.JoinedAt).ToArray();
 
                     // Generate default file name
-                    var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, "!MEMBERS!", guild.Name);
+                    var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, guild, "GuildMember");
 
                     // Generate file path
                     var filePath = Path.Combine(Options.OutputPath ?? "", fileName);
@@ -68,7 +68,7 @@ namespace DiscordChatExporter.Cli.Verbs
                     // Order guild roles by position in descending order (Highest position goes first)
                     roles = roles.OrderByDescending(c => c.Position).ToArray();
 
-                    var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, "!ROLES!", guild.Name);
+                    var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, guild, "Role");
                     var filePath = Path.Combine(Options.OutputPath ?? "", fileName);
                     await exportService.ExportGuildRolesAsync(roles, filePath, Options.ExportFormat);
 

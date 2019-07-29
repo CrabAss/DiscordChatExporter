@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Core.Rendering
 {
@@ -28,14 +30,11 @@ namespace DiscordChatExporter.Core.Rendering
             await writer.WriteAsync($"\"{encodedValue}\";");
         }
 
-        private async Task RenderBoolAsync(TextWriter writer, bool value)
-        {
-            await writer.WriteAsync(value == true ? "true;" : "false;");
-        }
+        private async Task RenderBoolAsync(TextWriter writer, bool value) => await writer.WriteAsync($"{value.ToString().ToLower()};");
 
         private async Task RenderRolesAsync(TextWriter writer, IReadOnlyList<string> roles)
         {
-            await writer.WriteAsync($"\"{string.Join(", ", roles)}\";");
+            await writer.WriteAsync($"[{roles.Select(a => $"\"{a}\"").JoinToString(", ")}];");
         }
 
         private async Task RenderGuildMemberAsync(TextWriter writer, GuildMember guildMember)
@@ -43,20 +42,17 @@ namespace DiscordChatExporter.Core.Rendering
             // User ID
             await RenderFieldAsync(writer, guildMember.User.Id);
 
-            // User FullName
+            // Full Username
             await RenderFieldAsync(writer, guildMember.User.FullName);
-
-            // User is bot?
-            await RenderBoolAsync(writer, guildMember.User.IsBot);
 
             // User avatar URL
             await RenderFieldAsync(writer, guildMember.User.AvatarUrl);
 
+            // User is bot?
+            await RenderBoolAsync(writer, guildMember.User.IsBot);
+
             // User Nickname in guild
             await RenderFieldAsync(writer, guildMember.Nickname ?? "");
-
-            // User Roles
-            await RenderRolesAsync(writer, guildMember.Roles);
 
             // when did the user join this guild
             await RenderFieldAsync(writer, FormatDate(guildMember.JoinedAt));
@@ -64,11 +60,8 @@ namespace DiscordChatExporter.Core.Rendering
             // premium since
             await RenderFieldAsync(writer, guildMember.PremiumSince == null ? "" : FormatDate(guildMember.PremiumSince));
 
-            // User is deaf?
-            await RenderBoolAsync(writer, guildMember.IsDeaf);
-
-            // User is mute?
-            await RenderBoolAsync(writer, guildMember.IsMute);
+            // User Roles
+            await RenderRolesAsync(writer, guildMember.Roles);
 
             // Line break
             await writer.WriteLineAsync();
@@ -77,7 +70,7 @@ namespace DiscordChatExporter.Core.Rendering
         public async Task RenderAsync(TextWriter writer)
         {
             // Headers
-            await writer.WriteLineAsync("ID;FullName;IsBot;AvatarURL;NicknameInGuild;Roles;JoinedAt;PremiumSince;IsDeaf;IsMute;");
+            await writer.WriteLineAsync("ID;FullUsername;AvatarURL;IsBot;NicknameInGuild;JoinedAt;PremiumSince;Roles;");
 
             // Log
             foreach (GuildMember guildMember in _guildMembers)

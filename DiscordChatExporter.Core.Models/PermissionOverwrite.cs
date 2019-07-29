@@ -8,9 +8,9 @@ namespace DiscordChatExporter.Core.Models
 {
     public partial class PermissionOverwrite
     {
-        public string Id { get; }
+        public string EntityId { get; }
 
-        public PermissionOverwriteType Type { get; }
+        public bool EntityIsMember { get; }
 
         public Permissions Allow { get; }
 
@@ -18,18 +18,15 @@ namespace DiscordChatExporter.Core.Models
 
         public PermissionOverwrite(string id, string type, ulong allowBitSet, ulong denyBitSet)
         {
-            Id = id;
-            if (type == "role")
-                Type = PermissionOverwriteType.Role;
-            else
-                Type = PermissionOverwriteType.User;
+            EntityId = id;
+            EntityIsMember = type == "member";
             Allow = new Permissions(allowBitSet);
             Deny = new Permissions(denyBitSet);
         }
 
         public override string ToString()
         {
-            return $"{{'Id': '{Id}', 'Type': '{Enum.GetName(typeof(PermissionOverwriteType), Type)}', 'Allow': '{Allow.ToString()}', 'Deny': '{Deny.ToString()}'}}";
+            return $"{{\"EntityId\": \"{EntityId}\", \"EntityIsMember\": {EntityIsMember.ToString().ToLower()}, \"Allow\": \"{Allow.ToString()}\", \"Deny\": \"{Deny.ToString()}\"}}";
         }
     }
 }
