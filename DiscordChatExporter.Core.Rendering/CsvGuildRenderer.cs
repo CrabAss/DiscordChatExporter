@@ -50,7 +50,7 @@ namespace DiscordChatExporter.Core.Rendering
         public async Task RenderAsync(TextWriter writer)
         {
             // Headers
-            await writer.WriteLineAsync("ID;Name;OwnerId;VerificationLevel;Description;");
+            await writer.WriteLineAsync("ID;Name;OwnerID;VerificationLevel;Description;");
 
             // Log
             await RenderGuildAsync(writer, _guild);

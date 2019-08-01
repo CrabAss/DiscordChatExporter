@@ -57,7 +57,7 @@ namespace DiscordChatExporter.Core.Rendering
         public async Task RenderAsync(TextWriter writer)
         {
             // Headers
-            await writer.WriteLineAsync("ID;ParentId;Type;Name;Topic;Overwrites;");
+            await writer.WriteLineAsync("ID;ParentID;Type;Name;Topic;Overwrites;");
 
             // Log
             foreach (Channel channel in _channels)

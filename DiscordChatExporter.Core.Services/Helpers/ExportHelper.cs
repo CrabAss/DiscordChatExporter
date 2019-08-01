@@ -21,33 +21,35 @@ namespace DiscordChatExporter.Core.Services.Helpers
 
             // Append guild and channel names
             result.Append($"{guild.Id}");
-            if (channel != null)
-                result.Append($" - {channel.Name} [{channel.Id}]");
+            if (channel == null)
+                result.Append("-Message");
             else
-                result.Append(" - Message");
-
-            // Append date range
-            if (after != null || before != null)
             {
-                result.Append(" (");
+                result.Append($" - {channel.Name} [{channel.Id}]");
 
-                // Both 'after' and 'before' are set
-                if (after != null && before != null)
+                // Append date range
+                if (after != null || before != null)
                 {
-                    result.Append($"{after:yyyy-MM-dd} to {before:yyyy-MM-dd}");
-                }
-                // Only 'after' is set
-                else if (after != null)
-                {
-                    result.Append($"after {after:yyyy-MM-dd}");
-                }
-                // Only 'before' is set
-                else
-                {
-                    result.Append($"before {before:yyyy-MM-dd}");
-                }
+                    result.Append(" (");
 
-                result.Append(")");
+                    // Both 'after' and 'before' are set
+                    if (after != null && before != null)
+                    {
+                        result.Append($"{after:yyyy-MM-dd} to {before:yyyy-MM-dd}");
+                    }
+                    // Only 'after' is set
+                    else if (after != null)
+                    {
+                        result.Append($"after {after:yyyy-MM-dd}");
+                    }
+                    // Only 'before' is set
+                    else
+                    {
+                        result.Append($"before {before:yyyy-MM-dd}");
+                    }
+
+                    result.Append(")");
+                }
             }
 
             // Append extension
@@ -65,7 +67,7 @@ namespace DiscordChatExporter.Core.Services.Helpers
             var result = new StringBuilder();
 
             // Append guild and channel names
-            result.Append($"{guild.Id} - {remark}");
+            result.Append($"{guild.Id}-{remark}");
 
 
             // Append extension

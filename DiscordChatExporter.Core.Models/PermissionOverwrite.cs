@@ -26,7 +26,7 @@ namespace DiscordChatExporter.Core.Models
 
         public override string ToString()
         {
-            return $"{{\"EntityId\": \"{EntityId}\", \"EntityIsMember\": {EntityIsMember.ToString().ToLower()}, \"Allow\": \"{Allow.ToString()}\", \"Deny\": \"{Deny.ToString()}\"}}";
+            return $"{{\"EntityID\": \"{EntityId}\", \"EntityIsMember\": {EntityIsMember.ToString().ToLower()}, \"Allow\": \"{Allow.ToString()}\", \"Deny\": \"{Deny.ToString()}\"}}";
         }
     }
 }
