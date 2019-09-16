@@ -6,11 +6,14 @@ namespace DiscordChatExporter.Cli.Verbs.Options
 {
     public abstract class ExportOptions : TokenOptions
     {
-        [Option('f', "format", Default = ExportFormat.HtmlDark, HelpText = "Output file format.")]
+        [Option('f', "format", Default = ExportFormat.Csv, HelpText = "Output file format.")]
         public ExportFormat ExportFormat { get; set; }
 
         [Option('o', "output", Default = null, HelpText = "Output file or directory path.")]
         public string OutputPath { get; set; }
+
+        [Option("bucket", Default = null, HelpText = "If you'd like to upload the output to Amazon S3, you can specify the bucket name here.")]
+        public string BucketName { get; set; }
 
         // HACK: CommandLineParser doesn't support DateTimeOffset
         [Option("after", Default = null, HelpText = "Limit to messages sent after this date.")]

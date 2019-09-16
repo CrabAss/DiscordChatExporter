@@ -45,7 +45,7 @@ namespace DiscordChatExporter.Cli.Verbs
                 string filePath = Path.Combine(Options.OutputPath ?? "", fileName);
 
                 // Export
-                await exportService.ExportGuildAsync(guild, filePath, Options.ExportFormat);
+                await exportService.ExportGuildAsync(guild, filePath, Options.ExportFormat, Options.BucketName);
 
                 progress.ReportCompletion();
             }
@@ -72,7 +72,7 @@ namespace DiscordChatExporter.Cli.Verbs
                 string filePath = Path.Combine(Options.OutputPath ?? "", fileName);
 
                 // Export
-                await exportService.ExportGuildChannelsAsync(channels, filePath, Options.ExportFormat);
+                await exportService.ExportGuildChannelsAsync(channels, filePath, Options.ExportFormat, Options.BucketName);
 
                 progress.ReportCompletion();
             }
@@ -107,7 +107,7 @@ namespace DiscordChatExporter.Cli.Verbs
 
                         // Export
                         await exportService.ExportChatLogAsync(chatLogs[i], filePath, Options.ExportFormat,
-                            Options.PartitionLimit);
+                            Options.PartitionLimit, Options.BucketName);
 
                         // Report successful completion
                         progress.ReportCompletion();
@@ -166,7 +166,7 @@ namespace DiscordChatExporter.Cli.Verbs
             string filePath = Path.Combine(Options.OutputPath ?? "", fileName);
 
             // Export
-            await exportService.ExportChatLogAsync(chatLogs, filePath, Options.ExportFormat);
+            await exportService.ExportChatLogAsync(chatLogs, filePath, Options.ExportFormat, Options.BucketName);
 
 
         }

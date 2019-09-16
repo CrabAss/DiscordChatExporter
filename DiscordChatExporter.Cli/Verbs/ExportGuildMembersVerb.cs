@@ -54,7 +54,7 @@ namespace DiscordChatExporter.Cli.Verbs
                     var filePath = Path.Combine(Options.OutputPath ?? "", fileName);
 
                     // Export
-                    await exportService.ExportGuildMembersAsync(guildMembers, filePath, Options.ExportFormat);
+                    await exportService.ExportGuildMembersAsync(guildMembers, filePath, Options.ExportFormat, Options.BucketName);
 
                     progress.ReportCompletion();
                 }
@@ -70,7 +70,7 @@ namespace DiscordChatExporter.Cli.Verbs
 
                     var fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, guild, "Role");
                     var filePath = Path.Combine(Options.OutputPath ?? "", fileName);
-                    await exportService.ExportGuildRolesAsync(roles, filePath, Options.ExportFormat);
+                    await exportService.ExportGuildRolesAsync(roles, filePath, Options.ExportFormat, Options.BucketName);
 
                     progress.ReportCompletion();
                 }

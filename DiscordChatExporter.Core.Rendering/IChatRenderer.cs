@@ -5,6 +5,6 @@ namespace DiscordChatExporter.Core.Rendering
 {
     public interface IChatRenderer
     {
-        Task RenderAsync(TextWriter writer);
+        Task RenderAsync(StreamWriter writer);
     }
 }

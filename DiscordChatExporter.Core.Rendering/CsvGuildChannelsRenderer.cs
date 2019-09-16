@@ -1,5 +1,4 @@
 ﻿using DiscordChatExporter.Core.Models;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,19 +17,19 @@ namespace DiscordChatExporter.Core.Rendering
             _dateFormat = dateFormat;
         }
 
-        private async Task RenderFieldAsync(TextWriter writer, string value)
+        private async Task RenderFieldAsync(StreamWriter writer, string value)
         {
             var encodedValue = value.Replace("\"", "\"\"");
             await writer.WriteAsync($"\"{encodedValue}\";");
         }
 
-        private async Task RenderOverwriteAsync(TextWriter writer, PermissionOverwrite[] overwrites)
+        private async Task RenderOverwriteAsync(StreamWriter writer, PermissionOverwrite[] overwrites)
         {
             string[] overwriteStrings = overwrites.Select(x => x.ToString()).ToArray();
             await writer.WriteAsync($"[{string.Join(", ", overwriteStrings)}];");
         }
 
-        private async Task RenderGuildChannelAsync(TextWriter writer, Channel channel)
+        private async Task RenderGuildChannelAsync(StreamWriter writer, Channel channel)
         {
             // Channel ID
             await RenderFieldAsync(writer, channel.Id);
@@ -54,7 +53,7 @@ namespace DiscordChatExporter.Core.Rendering
             await writer.WriteLineAsync();
         }
 
-        public async Task RenderAsync(TextWriter writer)
+        public async Task RenderAsync(StreamWriter writer)
         {
             // Headers
             await writer.WriteLineAsync("ID;ParentID;Type;Name;Topic;Overwrites;");

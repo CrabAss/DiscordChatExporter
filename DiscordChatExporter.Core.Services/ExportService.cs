@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Amazon;
+using Amazon.S3;
+using Amazon.S3.Transfer;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,9 +16,17 @@ namespace DiscordChatExporter.Core.Services
     {
         private readonly SettingsService _settingsService;
 
+        // AWS S3
+        // private const string bucketName = "chatrank";
+        private static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUWest2;
+        private static IAmazonS3 s3Client;
+
         public ExportService(SettingsService settingsService)
         {
             _settingsService = settingsService;
+
+            // AWS S3
+            s3Client = new AmazonS3Client(bucketRegion);
         }
 
         private IChatRenderer CreateRenderer(ChatLog chatLog, ExportFormat format)
@@ -75,7 +86,7 @@ namespace DiscordChatExporter.Core.Services
             throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
         }
 
-        public async Task ExportGuildMembersAsync(IReadOnlyList<GuildMember> guildMembers, string filePath, ExportFormat format)
+        public async Task ExportGuildMembersAsync(IReadOnlyList<GuildMember> guildMembers, string filePath, ExportFormat format, string S3BucketName = null)
         {
             // Create output directory
             var dirPath = Path.GetDirectoryName(filePath);
@@ -85,9 +96,12 @@ namespace DiscordChatExporter.Core.Services
             // Render chat log to output file
             using (var writer = File.CreateText(filePath))
                 await CreateRenderer(guildMembers, format).RenderAsync(writer);
+
+            if (S3BucketName != null)
+                await UploadToS3(S3BucketName, filePath);
         }
 
-        public async Task ExportGuildRolesAsync(IReadOnlyList<Role> roles, string filePath, ExportFormat format)
+        public async Task ExportGuildRolesAsync(IReadOnlyList<Role> roles, string filePath, ExportFormat format, string S3BucketName = null)
         {
             // Create output directory
             var dirPath = Path.GetDirectoryName(filePath);
@@ -97,9 +111,12 @@ namespace DiscordChatExporter.Core.Services
             // Render chat log to output file
             using (var writer = File.CreateText(filePath))
                 await CreateRenderer(roles, format).RenderAsync(writer);
+
+            if (S3BucketName != null)
+                await UploadToS3(S3BucketName, filePath);
         }
 
-        public async Task ExportGuildChannelsAsync(IReadOnlyList<Channel> channels, string filePath, ExportFormat format)
+        public async Task ExportGuildChannelsAsync(IReadOnlyList<Channel> channels, string filePath, ExportFormat format, string S3BucketName = null)
         {
             // Create output directory
             var dirPath = Path.GetDirectoryName(filePath);
@@ -109,9 +126,12 @@ namespace DiscordChatExporter.Core.Services
             // Render chat log to output file
             using (var writer = File.CreateText(filePath))
                 await CreateRenderer(channels, format).RenderAsync(writer);
+
+            if (S3BucketName != null)
+                await UploadToS3(S3BucketName, filePath);
         }
 
-        public async Task ExportGuildAsync(Guild guild, string filePath, ExportFormat format)
+        public async Task ExportGuildAsync(Guild guild, string filePath, ExportFormat format, string S3BucketName = null)
         {
             // Create output directory
             var dirPath = Path.GetDirectoryName(filePath);
@@ -121,9 +141,13 @@ namespace DiscordChatExporter.Core.Services
             // Render chat log to output file
             using (var writer = File.CreateText(filePath))
                 await CreateRenderer(guild, format).RenderAsync(writer);
+
+            if (S3BucketName != null)
+                await UploadToS3(S3BucketName, filePath);
         }
 
-        public async Task ExportChatLogAsync(IReadOnlyList<ChatLog> chatLogs, string filePath, ExportFormat format)
+        /* Bundled ChatLog Export */
+        public async Task ExportChatLogAsync(IReadOnlyList<ChatLog> chatLogs, string filePath, ExportFormat format, string S3BucketName = null)
         {
             // Create output directory
             var dirPath = Path.GetDirectoryName(filePath);
@@ -134,9 +158,12 @@ namespace DiscordChatExporter.Core.Services
             File.Delete(filePath);
             using (var writer = File.AppendText(filePath))
                 await CreateRenderer(chatLogs, format).RenderAsync(writer);
+
+            if (S3BucketName != null)
+                await UploadToS3(S3BucketName, filePath);
         }
 
-        private async Task ExportChatLogAsync(ChatLog chatLog, string filePath, ExportFormat format)
+        private async Task ExportChatLogAsync(ChatLog chatLog, string filePath, ExportFormat format, string S3BucketName = null)
         {
             // Create output directory
             var dirPath = Path.GetDirectoryName(filePath);
@@ -146,9 +173,12 @@ namespace DiscordChatExporter.Core.Services
             // Render chat log to output file
             using (var writer = File.CreateText(filePath))
                 await CreateRenderer(chatLog, format).RenderAsync(writer);
+
+            if (S3BucketName != null)
+                await UploadToS3(S3BucketName, filePath);
         }
 
-        public async Task ExportChatLogAsync(ChatLog chatLog, string filePath, ExportFormat format, int? partitionLimit)
+        public async Task ExportChatLogAsync(ChatLog chatLog, string filePath, ExportFormat format, int? partitionLimit, string S3BucketName = null)
         {
             // If partitioning is disabled or there are fewer messages in chat log than the limit - process it without partitioning
             if (partitionLimit == null || partitionLimit <= 0 || chatLog.Messages.Count <= partitionLimit)
@@ -182,10 +212,34 @@ namespace DiscordChatExporter.Core.Services
                     // Export
                     await ExportChatLogAsync(partition, partitionFilePath, format);
 
+                    if (S3BucketName != null)
+                        await UploadToS3(S3BucketName, partitionFilePath);
+
                     // Increment partition number
                     partitionNumber++;
                 }
             }
+        }
+
+        public async Task UploadToS3(string bucketName, string filePath, bool deleteLocalCopyAfterUpload = true)
+        {
+            string today = DateTime.Today.ToString("yyyyMMdd");
+            string keyName = $"discord/raw_archive/{today}/{filePath}";
+            try
+            {
+                var fileTransferUtility = new TransferUtility(s3Client);
+                await fileTransferUtility.UploadAsync(filePath, bucketName, keyName);
+                if (deleteLocalCopyAfterUpload) File.Delete(filePath);
+            }
+            catch (AmazonS3Exception e)
+            {
+                Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+
         }
     }
 }

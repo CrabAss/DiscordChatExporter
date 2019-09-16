@@ -24,20 +24,20 @@ namespace DiscordChatExporter.Core.Rendering
         private string FormatDate(DateTimeOffset? date) =>
             date?.ToLocalTime().ToString(_dateFormat, CultureInfo.InvariantCulture);
 
-        private async Task RenderFieldAsync(TextWriter writer, string value)
+        private async Task RenderFieldAsync(StreamWriter writer, string value)
         {
             var encodedValue = value.Replace("\"", "\"\"");
             await writer.WriteAsync($"\"{encodedValue}\";");
         }
 
-        private async Task RenderBoolAsync(TextWriter writer, bool value) => await writer.WriteAsync($"{value.ToString().ToLower()};");
+        private async Task RenderBoolAsync(StreamWriter writer, bool value) => await writer.WriteAsync($"{value.ToString().ToLower()};");
 
-        private async Task RenderRolesAsync(TextWriter writer, IReadOnlyList<string> roles)
+        private async Task RenderRolesAsync(StreamWriter writer, IReadOnlyList<string> roles)
         {
             await writer.WriteAsync($"[{roles.Select(a => $"\"{a}\"").JoinToString(", ")}];");
         }
 
-        private async Task RenderGuildMemberAsync(TextWriter writer, GuildMember guildMember)
+        private async Task RenderGuildMemberAsync(StreamWriter writer, GuildMember guildMember)
         {
             // User ID
             await RenderFieldAsync(writer, guildMember.User.Id);
@@ -67,7 +67,7 @@ namespace DiscordChatExporter.Core.Rendering
             await writer.WriteLineAsync();
         }
 
-        public async Task RenderAsync(TextWriter writer)
+        public async Task RenderAsync(StreamWriter writer)
         {
             // Headers
             await writer.WriteLineAsync("ID;FullUsername;AvatarURL;IsBot;NicknameInGuild;JoinedAt;PremiumSince;Roles;");

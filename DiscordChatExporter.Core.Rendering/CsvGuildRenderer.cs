@@ -1,10 +1,5 @@
 ﻿using DiscordChatExporter.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DiscordChatExporter.Core.Rendering
@@ -20,13 +15,13 @@ namespace DiscordChatExporter.Core.Rendering
             _dateFormat = dateFormat;
         }
 
-        private async Task RenderFieldAsync(TextWriter writer, string value)
+        private async Task RenderFieldAsync(StreamWriter writer, string value)
         {
             var encodedValue = value.Replace("\"", "\"\"");
             await writer.WriteAsync($"\"{encodedValue}\";");
         }
 
-        private async Task RenderGuildAsync(TextWriter writer, Guild guild)
+        private async Task RenderGuildAsync(StreamWriter writer, Guild guild)
         {
             // Guild ID
             await RenderFieldAsync(writer, guild.Id);
@@ -47,7 +42,7 @@ namespace DiscordChatExporter.Core.Rendering
             await writer.WriteLineAsync();
         }
 
-        public async Task RenderAsync(TextWriter writer)
+        public async Task RenderAsync(StreamWriter writer)
         {
             // Headers
             await writer.WriteLineAsync("ID;Name;OwnerID;VerificationLevel;Description;");

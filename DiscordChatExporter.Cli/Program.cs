@@ -60,8 +60,9 @@ namespace DiscordChatExporter.Cli
             // Execute commands
             parsedArgs.WithParsed<ExportChannelOptions>(o => new ExportChannelVerb(o).Execute());
             parsedArgs.WithParsed<ExportDirectMessagesOptions>(o => new ExportDirectMessagesVerb(o).Execute());
+            parsedArgs.WithParsed<ExportAllOptions>(o => new ExportAllVerb(o).Execute());
             parsedArgs.WithParsed<ExportGuildOptions>(o => new ExportGuildVerb(o).Execute());
-            parsedArgs.WithParsed<ExportGuildMembersOptions>(o => new ExportGuildMembersVerb(o).Execute()); // new
+            parsedArgs.WithParsed<ExportGuildMembersOptions>(o => new ExportGuildMembersVerb(o).Execute());
             parsedArgs.WithParsed<GetChannelsOptions>(o => new GetChannelsVerb(o).Execute());
             parsedArgs.WithParsed<GetDirectMessageChannelsOptions>(o => new GetDirectMessageChannelsVerb(o).Execute());
             parsedArgs.WithParsed<GetGuildsOptions>(o => new GetGuildsVerb(o).Execute());
