@@ -16,7 +16,7 @@ namespace DiscordChatExporter.Core.Models
 
         public string OwnerId { get; }
 
-        public uint VerificationLevel { get; }
+        public uint? VerificationLevel { get; }
 
         public string Description { get; }
 
@@ -26,7 +26,7 @@ namespace DiscordChatExporter.Core.Models
             Name = name;
         }
 
-        public Guild(string id, string name, string iconHash, string ownerId, uint verificationLevel, string description)
+        public Guild(string id, string name, string iconHash, string ownerId, uint? verificationLevel, string description)
         {
             Id = id;
             Name = name;

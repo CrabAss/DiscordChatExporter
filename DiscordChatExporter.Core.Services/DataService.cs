@@ -129,7 +129,7 @@ namespace DiscordChatExporter.Core.Services
 
         public async Task<IReadOnlyList<Guild>> GetUserGuildsAsync(AuthToken token)
         {
-            JToken response = await GetApiResponseAsync(token, "users", "@me/guilds", "limit=100");
+            JToken response = await GetApiResponseAsync(token, "users", "@me/guilds");
             Guild[] guilds = response.Select(ParseGuild).ToArray();
 
             return guilds;

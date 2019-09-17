@@ -1,4 +1,5 @@
-﻿using DiscordChatExporter.Cli.Verbs.Options;
+﻿using CommandLine;
+using DiscordChatExporter.Cli.Verbs.Options;
 using DiscordChatExporter.Core.Models;
 using DiscordChatExporter.Core.Services;
 using System.Collections.Generic;
@@ -13,7 +14,6 @@ namespace DiscordChatExporter.Cli.Verbs
         readonly DataService dataService = Container.Instance.Get<DataService>();
         // ExportService exportService = Container.Instance.Get<ExportService>();
 
-
         public ExportAllVerb(ExportAllOptions options) : base(options)
         {
         }
@@ -27,15 +27,31 @@ namespace DiscordChatExporter.Cli.Verbs
             {
                 IReadOnlyList<Guild> guilds = await dataService.GetUserGuildsAsync(token);
 
-                const string bucketParam = "--bucket chatrank";
-                var tokenParam = new StringBuilder($"--token \"{token.Value}\"");
-                if (token.Type == AuthTokenType.Bot)
-                    tokenParam.Append(" -b");
-
                 foreach (var guild in guilds)
                 {
-                    Program.Main($"exportguild --after {Options.After} {tokenParam} {bucketParam} --guild {guild.Id} --bundled".Split(' '));
-                    Program.Main($"exportguildmembers {tokenParam} {bucketParam} --guild {guild.Id}".Split(' '));
+                    string exportGuildArg = Parser.Default.FormatCommandLine(new ExportGuildOptions
+                    {
+                        BucketName = Options.BucketName,
+                        After = Options.After,
+                        Before = Options.Before,
+                        TokenValue = token.Value,
+                        IsBotToken = token.Type == AuthTokenType.Bot,
+                        GuildId = guild.Id,
+                        IsBundled = true,
+                        PartitionLimit = Options.PartitionLimit,
+                        DateFormat = Options.DateFormat,
+                    });
+                    var exportGuildMemberArg = Parser.Default.FormatCommandLine(new ExportGuildMembersOptions
+                    {
+                        BucketName = Options.BucketName,
+                        TokenValue = token.Value,
+                        IsBotToken = token.Type == AuthTokenType.Bot,
+                        GuildId = guild.Id,
+                        DateFormat = Options.DateFormat,
+                    });
+
+                    Program.Main($"exportguild {exportGuildArg}".Split(' '));
+                    Program.Main($"exportguildmembers {exportGuildMemberArg}".Split(' '));
                 }
 
                 // guildListByToken.Add(token, guilds);

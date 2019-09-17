@@ -6,9 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Core" Version="3.3.103.37" />
-    <PackageReference Include="AWSSDK.EC2" Version="3.3.130" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.104.25" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.103.38" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.104.26" />
     <PackageReference Include="Failsafe" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Onova" Version="2.4.5" />
