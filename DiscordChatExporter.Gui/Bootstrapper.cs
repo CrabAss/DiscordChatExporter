@@ -1,10 +1,10 @@
-﻿using System.Windows;
-using System.Windows.Threading;
-using DiscordChatExporter.Core.Services;
+﻿using DiscordChatExporter.Core.Services;
 using DiscordChatExporter.Gui.ViewModels;
 using DiscordChatExporter.Gui.ViewModels.Framework;
 using Stylet;
 using StyletIoC;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace DiscordChatExporter.Gui
 {

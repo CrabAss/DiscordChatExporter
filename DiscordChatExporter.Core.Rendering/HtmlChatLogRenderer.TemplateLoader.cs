@@ -1,8 +1,8 @@
-﻿using System.Reflection;
-using System.Threading.Tasks;
-using Scriban;
+﻿using Scriban;
 using Scriban.Parsing;
 using Scriban.Runtime;
+using System.Reflection;
+using System.Threading.Tasks;
 using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Core.Rendering

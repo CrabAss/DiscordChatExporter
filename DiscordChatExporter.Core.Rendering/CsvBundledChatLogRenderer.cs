@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using DiscordChatExporter.Core.Models;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using DiscordChatExporter.Core.Models;
 
 namespace DiscordChatExporter.Core.Rendering
 {

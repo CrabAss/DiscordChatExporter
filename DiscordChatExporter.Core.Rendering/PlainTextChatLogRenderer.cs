@@ -1,12 +1,12 @@
-﻿using System;
+﻿using DiscordChatExporter.Core.Markdown;
+using DiscordChatExporter.Core.Markdown.Nodes;
+using DiscordChatExporter.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using DiscordChatExporter.Core.Markdown;
-using DiscordChatExporter.Core.Markdown.Nodes;
-using DiscordChatExporter.Core.Models;
 using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Core.Rendering

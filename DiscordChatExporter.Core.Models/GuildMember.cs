@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Core.Models
 {

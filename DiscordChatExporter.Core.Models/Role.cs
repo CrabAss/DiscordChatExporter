@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DiscordChatExporter.Core.Models
+﻿namespace DiscordChatExporter.Core.Models
 {
     // https://discordapp.com/developers/docs/topics/permissions#role-object
 
@@ -17,13 +14,24 @@ namespace DiscordChatExporter.Core.Models
 
         public uint Position { get; }
 
+
+/* 项目“DiscordChatExporter.Core.Models (netcoreapp2.2)”的未合并的更改
+在此之前:
         public Permissions PermissionSet { get; }
         
+        public bool IsManaged { get; }
+在此之后:
+        public Permissions PermissionSet { get; }
+
+        public bool IsManaged { get; }
+*/
+        public Permissions PermissionSet { get; }
+
         public bool IsManaged { get; }
 
         public bool IsMentionable { get; }
 
-        public Role(string id, string name, uint color, bool isHoisted, uint position, 
+        public Role(string id, string name, uint color, bool isHoisted, uint position,
             ulong permissionBitSet, bool isManaged, bool isMentionable)
         {
             Id = id;

@@ -16,7 +16,7 @@ namespace DiscordChatExporter.Gui.ViewModels.Framework
                 RequestClose(Equals(dialogResult, default(T)));
             // Otherwise close ourselves
             else
-                ((IScreenState) this).Close();
+                ((IScreenState)this).Close();
         }
     }
 

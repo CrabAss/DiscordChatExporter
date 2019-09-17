@@ -1,9 +1,9 @@
-﻿using System;
-using System.Drawing;
-using System.Linq;
-using DiscordChatExporter.Core.Models;
+﻿using DiscordChatExporter.Core.Models;
 using DiscordChatExporter.Core.Services.Internal;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Drawing;
+using System.Linq;
 using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Core.Services
@@ -39,7 +39,7 @@ namespace DiscordChatExporter.Core.Services
             // Get basic data
             string id = json["id"].Value<string>();
             string parentId = json["parent_id"]?.Value<string>();
-            ChannelType type = (ChannelType) json["type"].Value<int>();
+            ChannelType type = (ChannelType)json["type"].Value<int>();
             string topic = json["topic"]?.Value<string>();
 
             // Try to extract guild ID
@@ -190,7 +190,7 @@ namespace DiscordChatExporter.Core.Services
             DateTimeOffset timestamp = json["timestamp"].Value<DateTime>().ToDateTimeOffset();
             DateTimeOffset? editedTimestamp = json["edited_timestamp"]?.Value<DateTime?>()?.ToDateTimeOffset();
             string content = json["content"].Value<string>();
-            MessageType type = (MessageType) json["type"].Value<int>();
+            MessageType type = (MessageType)json["type"].Value<int>();
 
             // Workarounds for non-default types
             if (type == MessageType.RecipientAdd)

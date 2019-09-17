@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using DiscordChatExporter.Cli.Verbs.Options;
+﻿using DiscordChatExporter.Cli.Verbs.Options;
 using DiscordChatExporter.Core.Models;
 using DiscordChatExporter.Core.Services;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DiscordChatExporter.Cli.Verbs
 {

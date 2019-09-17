@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using DiscordChatExporter.Core.Models;
+﻿using DiscordChatExporter.Core.Models;
 using DiscordChatExporter.Core.Services;
 using DiscordChatExporter.Core.Services.Helpers;
 using DiscordChatExporter.Gui.ViewModels.Components;
 using DiscordChatExporter.Gui.ViewModels.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Gui.ViewModels.Dialogs

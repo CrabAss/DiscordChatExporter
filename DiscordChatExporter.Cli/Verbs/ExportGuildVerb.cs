@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using DiscordChatExporter.Cli.Internal;
+﻿using DiscordChatExporter.Cli.Internal;
 using DiscordChatExporter.Cli.Verbs.Options;
 using DiscordChatExporter.Core.Models;
 using DiscordChatExporter.Core.Services;
 using DiscordChatExporter.Core.Services.Exceptions;
 using DiscordChatExporter.Core.Services.Helpers;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Cli.Verbs
@@ -187,7 +187,7 @@ namespace DiscordChatExporter.Cli.Verbs
                 await ExportBundledGuildChatLog();
             else
                 await ExportGuildChatLogs();
-            
+
         }
     }
 }

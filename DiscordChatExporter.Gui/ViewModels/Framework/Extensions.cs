@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using DiscordChatExporter.Core.Models;
+﻿using DiscordChatExporter.Core.Models;
 using DiscordChatExporter.Gui.ViewModels.Components;
 using DiscordChatExporter.Gui.ViewModels.Dialogs;
+using System.Collections.Generic;
 
 namespace DiscordChatExporter.Gui.ViewModels.Framework
 {

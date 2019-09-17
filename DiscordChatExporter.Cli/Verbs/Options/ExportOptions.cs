@@ -1,6 +1,6 @@
-﻿using System;
-using CommandLine;
+﻿using CommandLine;
 using DiscordChatExporter.Core.Models;
+using System;
 
 namespace DiscordChatExporter.Cli.Verbs.Options
 {

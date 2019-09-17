@@ -1,14 +1,14 @@
-﻿using System;
+﻿using DiscordChatExporter.Core.Models;
+using DiscordChatExporter.Core.Services.Exceptions;
+using DiscordChatExporter.Core.Services.Internal;
+using Failsafe;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using DiscordChatExporter.Core.Models;
-using DiscordChatExporter.Core.Services.Exceptions;
-using DiscordChatExporter.Core.Services.Internal;
-using Failsafe;
-using Newtonsoft.Json.Linq;
 using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Core.Services
@@ -22,8 +22,8 @@ namespace DiscordChatExporter.Core.Services
         {
             // Create retry policy
             IRetry retry = Retry.Create()
-                .Catch<HttpErrorStatusCodeException>(false, e => (int) e.StatusCode >= 500)
-                .Catch<HttpErrorStatusCodeException>(false, e => (int) e.StatusCode == 429)
+                .Catch<HttpErrorStatusCodeException>(false, e => (int)e.StatusCode >= 500)
+                .Catch<HttpErrorStatusCodeException>(false, e => (int)e.StatusCode == 429)
                 .WithMaxTryCount(10)
                 .WithDelay(TimeSpan.FromSeconds(0.4));
 

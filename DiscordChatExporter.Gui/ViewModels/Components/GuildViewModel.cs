@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using DiscordChatExporter.Core.Models;
+﻿using DiscordChatExporter.Core.Models;
 using Stylet;
+using System.Collections.Generic;
 
 namespace DiscordChatExporter.Gui.ViewModels.Components
 {

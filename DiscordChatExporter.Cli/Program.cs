@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
-using CommandLine;
+﻿using CommandLine;
 using DiscordChatExporter.Cli.Verbs;
 using DiscordChatExporter.Cli.Verbs.Options;
+using System;
+using System.Linq;
 
 namespace DiscordChatExporter.Cli
 {

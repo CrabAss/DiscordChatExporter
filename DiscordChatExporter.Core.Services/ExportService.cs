@@ -1,13 +1,13 @@
 ﻿using Amazon;
 using Amazon.S3;
 using Amazon.S3.Transfer;
+using DiscordChatExporter.Core.Models;
+using DiscordChatExporter.Core.Rendering;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using DiscordChatExporter.Core.Models;
-using DiscordChatExporter.Core.Rendering;
 using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Core.Services

@@ -1,9 +1,9 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 using Ookii.Dialogs.Wpf;
 using Stylet;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace DiscordChatExporter.Gui.ViewModels.Framework
 {

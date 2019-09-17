@@ -17,7 +17,7 @@ namespace DiscordChatExporter.Gui.Behaviors
 
         private static void OnSelectedItemsChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
         {
-            var behavior = (MultiSelectionListBoxBehavior<T>) sender;
+            var behavior = (MultiSelectionListBoxBehavior<T>)sender;
             if (behavior._modelHandled) return;
 
             if (behavior.AssociatedObject == null)
@@ -33,7 +33,7 @@ namespace DiscordChatExporter.Gui.Behaviors
 
         public IList SelectedItems
         {
-            get => (IList) GetValue(SelectedItemsProperty);
+            get => (IList)GetValue(SelectedItemsProperty);
             set => SetValue(SelectedItemsProperty, value);
         }
 
@@ -74,7 +74,7 @@ namespace DiscordChatExporter.Gui.Behaviors
             base.OnAttached();
 
             AssociatedObject.SelectionChanged += OnListBoxSelectionChanged;
-            ((INotifyCollectionChanged) AssociatedObject.Items).CollectionChanged += OnListBoxItemsChanged;
+            ((INotifyCollectionChanged)AssociatedObject.Items).CollectionChanged += OnListBoxItemsChanged;
         }
 
         /// <inheritdoc />
@@ -85,7 +85,7 @@ namespace DiscordChatExporter.Gui.Behaviors
             if (AssociatedObject != null)
             {
                 AssociatedObject.SelectionChanged -= OnListBoxSelectionChanged;
-                ((INotifyCollectionChanged) AssociatedObject.Items).CollectionChanged -= OnListBoxItemsChanged;
+                ((INotifyCollectionChanged)AssociatedObject.Items).CollectionChanged -= OnListBoxItemsChanged;
             }
         }
     }

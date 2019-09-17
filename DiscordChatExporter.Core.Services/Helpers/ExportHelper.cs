@@ -1,8 +1,8 @@
-﻿using System;
+﻿using DiscordChatExporter.Core.Models;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using DiscordChatExporter.Core.Models;
 using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Core.Services.Helpers

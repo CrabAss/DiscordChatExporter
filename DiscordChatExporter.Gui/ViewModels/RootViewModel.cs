@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using DiscordChatExporter.Core.Models;
+﻿using DiscordChatExporter.Core.Models;
 using DiscordChatExporter.Core.Services;
 using DiscordChatExporter.Core.Services.Exceptions;
 using DiscordChatExporter.Core.Services.Helpers;
@@ -14,6 +8,12 @@ using DiscordChatExporter.Gui.ViewModels.Framework;
 using Gress;
 using MaterialDesignThemes.Wpf;
 using Stylet;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Reflection;
 using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Gui.ViewModels

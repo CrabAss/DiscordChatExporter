@@ -38,7 +38,7 @@ namespace DiscordChatExporter.Core.Rendering
             await RenderFieldAsync(writer, channel.ParentId ?? "");
 
             // Channel Type
-            await RenderFieldAsync(writer, ((int) channel.Type).ToString());
+            await RenderFieldAsync(writer, ((int)channel.Type).ToString());
 
             // Channel Name
             await RenderFieldAsync(writer, channel.Name);

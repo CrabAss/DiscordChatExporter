@@ -9,7 +9,7 @@ namespace DiscordChatExporter.Core.Services.Internal
 
         public static string ToSnowflake(this DateTimeOffset dateTime)
         {
-            var value = ((ulong) dateTime.ToUnixTimeMilliseconds() - 1420070400000UL) << 22;
+            var value = ((ulong)dateTime.ToUnixTimeMilliseconds() - 1420070400000UL) << 22;
             return value.ToString();
         }
 

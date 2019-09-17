@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using DiscordChatExporter.Core.Services;
+﻿using DiscordChatExporter.Core.Services;
 using Onova;
 using Onova.Exceptions;
 using Onova.Services;
+using System;
+using System.Threading.Tasks;
 
 namespace DiscordChatExporter.Gui.Services
 {
