@@ -116,7 +116,6 @@ namespace DiscordChatExporter.Core.Rendering
             // Reactions
             await RenderReactionsAsync(writer, message.Reactions);
 
-            
 
             // Line break
             await writer.WriteLineAsync();
