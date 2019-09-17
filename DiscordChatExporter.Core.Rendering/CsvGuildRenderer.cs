@@ -15,13 +15,13 @@ namespace DiscordChatExporter.Core.Rendering
             _dateFormat = dateFormat;
         }
 
-        private async Task RenderFieldAsync(StreamWriter writer, string value)
+        private async Task RenderFieldAsync(TextWriter writer, string value)
         {
             var encodedValue = value.Replace("\"", "\"\"");
             await writer.WriteAsync($"\"{encodedValue}\";");
         }
 
-        private async Task RenderGuildAsync(StreamWriter writer, Guild guild)
+        private async Task RenderGuildAsync(TextWriter writer, Guild guild)
         {
             // Guild ID
             await RenderFieldAsync(writer, guild.Id);
@@ -42,7 +42,7 @@ namespace DiscordChatExporter.Core.Rendering
             await writer.WriteLineAsync();
         }
 
-        public async Task RenderAsync(StreamWriter writer)
+        public async Task RenderAsync(TextWriter writer)
         {
             // Headers
             await writer.WriteLineAsync("ID;Name;OwnerID;VerificationLevel;Description;");

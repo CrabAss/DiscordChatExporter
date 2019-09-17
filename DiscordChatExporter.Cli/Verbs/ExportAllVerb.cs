@@ -12,7 +12,7 @@ namespace DiscordChatExporter.Cli.Verbs
     class ExportAllVerb : Verb<ExportAllOptions>
     {
         // SettingsService settingsService = Container.Instance.Get<SettingsService>();
-        DataService dataService = Container.Instance.Get<DataService>();
+        readonly DataService dataService = Container.Instance.Get<DataService>();
         // ExportService exportService = Container.Instance.Get<ExportService>();
 
 

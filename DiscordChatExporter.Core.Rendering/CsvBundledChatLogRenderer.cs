@@ -17,7 +17,7 @@ namespace DiscordChatExporter.Core.Rendering
             _dateFormat = dateFormat;
         }
 
-        public async Task RenderAsync(StreamWriter writer)
+        public async Task RenderAsync(TextWriter writer)
         {
             // Headers
             await writer.WriteLineAsync("MessageID;ChannelID;AuthorID;Date;Content;Attachments;Reactions;");

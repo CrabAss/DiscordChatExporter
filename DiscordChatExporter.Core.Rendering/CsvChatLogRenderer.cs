@@ -8,7 +8,7 @@ namespace DiscordChatExporter.Core.Rendering
     {
         private readonly ChatLog _chatLog;
         private readonly string _dateFormat;
-        private CsvChatLogRenderUtil renderUtil;
+        private readonly CsvChatLogRenderUtil renderUtil;
 
         public CsvChatLogRenderer(ChatLog chatLog, string dateFormat)
         {
@@ -18,7 +18,7 @@ namespace DiscordChatExporter.Core.Rendering
         }
 
 
-        public async Task RenderAsync(StreamWriter writer)
+        public async Task RenderAsync(TextWriter writer)
         {
             // Headers
             await writer.WriteLineAsync("MessageID;ChannelID;AuthorID;Date;Content;Attachments;Reactions;");

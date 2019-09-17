@@ -10,7 +10,7 @@ namespace DiscordChatExporter.Core.Services
         public string DateFormat { get; set; } = "dd-MMM-yy hh:mm tt";
 
         public AuthToken LastToken { get; set; }
-        public ExportFormat LastExportFormat { get; set; } = ExportFormat.HtmlDark;
+        public ExportFormat LastExportFormat { get; set; } = ExportFormat.Csv;
         public int? LastPartitionLimit { get; set; }
 
         public SettingsService()

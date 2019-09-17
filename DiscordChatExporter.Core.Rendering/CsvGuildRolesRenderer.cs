@@ -17,15 +17,15 @@ namespace DiscordChatExporter.Core.Rendering
             _dateFormat = dateFormat;
         }
 
-        private async Task RenderFieldAsync(StreamWriter writer, string value)
+        private async Task RenderFieldAsync(TextWriter writer, string value)
         {
             var encodedValue = value.Replace("\"", "\"\"");
             await writer.WriteAsync($"\"{encodedValue}\";");
         }
 
-        private async Task RenderBoolAsync(StreamWriter writer, bool value) => await writer.WriteAsync($"{value.ToString().ToLower()};");
+        private async Task RenderBoolAsync(TextWriter writer, bool value) => await writer.WriteAsync($"{value.ToString().ToLower()};");
 
-        private async Task RenderGuildRoleAsync(StreamWriter writer, Role role)
+        private async Task RenderGuildRoleAsync(TextWriter writer, Role role)
         {
             // Role ID
             await RenderFieldAsync(writer, role.Id);
@@ -55,7 +55,7 @@ namespace DiscordChatExporter.Core.Rendering
             await writer.WriteLineAsync();
         }
 
-        public async Task RenderAsync(StreamWriter writer)
+        public async Task RenderAsync(TextWriter writer)
         {
             // Headers
             await writer.WriteLineAsync("ID;Name;Color;Position;Permissions;IsHoisted;IsManaged;IsMentionable;");

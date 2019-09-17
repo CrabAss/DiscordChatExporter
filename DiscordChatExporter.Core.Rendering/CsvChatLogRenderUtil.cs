@@ -75,24 +75,24 @@ namespace DiscordChatExporter.Core.Rendering
 
         private string FormatMarkdown(string markdown) => FormatMarkdown(MarkdownParser.Parse(markdown));
 
-        private async Task RenderFieldAsync(StreamWriter writer, string value)
+        private async Task RenderFieldAsync(TextWriter writer, string value)
         {
             string encodedValue = value.Replace("\"", "\"\"");
             await writer.WriteAsync($"\"{encodedValue}\";");
         }
 
-        private async Task RenderStringListAsync(StreamWriter writer, string value)
+        private async Task RenderStringListAsync(TextWriter writer, string value)
         {
             await writer.WriteAsync($"[{value}];");
         }
 
-        private async Task RenderReactionsAsync(StreamWriter writer, IReadOnlyList<Reaction> reactions)
+        private async Task RenderReactionsAsync(TextWriter writer, IReadOnlyList<Reaction> reactions)
         {
             string value = reactions.Select(r => $"\"{r.Emoji.Name}\": {r.Count}").JoinToString(", ");
             await writer.WriteAsync($"{{{value}}};");
         }
 
-        public async Task RenderMessageAsync(StreamWriter writer, Message message)
+        public async Task RenderMessageAsync(TextWriter writer, Message message)
         {
             // Message ID
             await RenderFieldAsync(writer, message.Id);
