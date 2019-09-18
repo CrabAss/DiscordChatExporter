@@ -228,7 +228,6 @@ namespace DiscordChatExporter.Core.Services
             CsvChatLogRenderer renderer, DateTimeOffset? after = null, DateTimeOffset? before = null, 
             IProgress<double> progress = null)
         {
-            //List<Message> result = new List<Message>();
             Message firstMsg = null, currentLastMsg = null;
             Mentionables mentionables = null;
 
@@ -267,20 +266,17 @@ namespace DiscordChatExporter.Core.Services
                     .TakeWhile(m => m.Id != lastMessage.Id && m.Timestamp < lastMessage.Timestamp)
                     .ToArray();
 
-                if (firstMsg == null)
-                    firstMsg = messagesInRange.First();
-                currentLastMsg = messagesInRange.Last();
-
                 mentionables = await GetMentionablesAsync(token, guild.Id, messagesInRange);
 
                 await renderer.RenderAsync(new ChatLog(guild, channel, after, before, messagesInRange, mentionables));
 
-                // Add to result
-                // result.AddRange(messagesInRange);
-
                 // Break if messages were trimmed (which means the last message was encountered)
                 if (messagesInRange.Length != messages.Length)
                     break;
+
+                if (firstMsg == null)
+                    firstMsg = messagesInRange.First();
+                currentLastMsg = messagesInRange.Last();
 
                 // Report progress (based on the time range of parsed messages compared to total)
                 progress?.Report((currentLastMsg.Timestamp - firstMsg.Timestamp).TotalSeconds /
@@ -295,9 +291,6 @@ namespace DiscordChatExporter.Core.Services
             mentionables = await GetMentionablesAsync(token, guild.Id, lastMessageList);
 
             await renderer.RenderAsync(new ChatLog(guild, channel, after, before, lastMessageList, mentionables));
-
-            // Add last message
-            // result.Add(lastMessage);
 
             // Report progress
             progress?.Report(1);
