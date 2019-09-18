@@ -6,8 +6,7 @@ namespace DiscordChatExporter.Cli.Verbs.Options
 {
     public abstract class ExportOptions : TokenOptions
     {
-        [Option('f', "format", Default = ExportFormat.Csv, HelpText = "Output file format.")]
-        public ExportFormat ExportFormat { get; set; }
+        public ExportFormat ExportFormat = ExportFormat.Csv;
 
         [Option('o', "output", Default = null, HelpText = "Output file or directory path.")]
         public string OutputPath { get; set; }

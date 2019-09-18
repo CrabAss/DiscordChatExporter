@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiscordChatExporter.Core.Rendering
 {
-    public class CsvGuildChannelsRenderer : IChatRenderer
+    public class CsvGuildChannelsRenderer
     {
         private readonly IReadOnlyList<Channel> _channels;
         private readonly string _dateFormat;

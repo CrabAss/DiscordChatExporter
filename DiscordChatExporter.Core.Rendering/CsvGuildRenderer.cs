@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace DiscordChatExporter.Core.Rendering
 {
-    public class CsvGuildRenderer : IChatRenderer
+    public class CsvGuildRenderer
     {
         private readonly Guild _guild;
         private readonly string _dateFormat;

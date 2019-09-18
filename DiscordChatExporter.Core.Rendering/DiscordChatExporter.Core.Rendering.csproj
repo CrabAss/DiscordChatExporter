@@ -1,18 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net46;netcoreapp2.2</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.2;net46</TargetFrameworks>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\HtmlDark.css" />
-    <EmbeddedResource Include="Resources\HtmlDark.html" />
-    <EmbeddedResource Include="Resources\HtmlLight.css" />
-    <EmbeddedResource Include="Resources\HtmlLight.html" />
-    <EmbeddedResource Include="Resources\HtmlShared.css" />
-    <EmbeddedResource Include="Resources\HtmlShared.html" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Scriban" Version="2.1.0" />

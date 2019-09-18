@@ -95,7 +95,7 @@ namespace DiscordChatExporter.Cli.Verbs
                     using (InlineProgress progress = new InlineProgress())
                     {
                         // Get chat log
-                        chatLogs[i] = await dataService.GetChatLogAsync(Options.GetToken(), channels[i],
+                        chatLogs[i] = await dataService.GetChatLogAsync(Options.GetToken(), guild, channels[i],
                             Options.After, Options.Before, progress);
 
                         // Generate default file name
@@ -126,10 +126,17 @@ namespace DiscordChatExporter.Cli.Verbs
 
         private async Task ExportBundledGuildChatLog()
         {
+            // Generate default file name
+            string fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, guild,
+                null, Options.After, Options.Before);
+
+            // Generate file path
+            string filePath = Path.Combine(Options.OutputPath ?? "", fileName);
+
+            var chatLogRenderer = exportService.CreateChatLogRenderer(filePath);
+
             // Filter and order channels
             channels = channels.Where(c => c.Type == ChannelType.GuildTextChat || c.Type == ChannelType.News).OrderBy(c => c.Name).ToArray();
-
-            ChatLog[] chatLogs = new ChatLog[channels.Count];
 
             // Loop through channels
             for (int i = 0; i < channels.Count; i++)
@@ -141,8 +148,8 @@ namespace DiscordChatExporter.Cli.Verbs
                     using (InlineProgress progress = new InlineProgress())
                     {
                         // Get chat log
-                        chatLogs[i] = await dataService.GetChatLogAsync(Options.GetToken(), channels[i],
-                            Options.After, Options.Before, progress);
+                        await dataService.GetAndExportChannelMessagesAsync(Options.GetToken(), guild, channels[i],
+                            chatLogRenderer, Options.After, Options.Before, progress);
 
                         // Report successful completion
                         progress.ReportCompletion();
@@ -158,16 +165,19 @@ namespace DiscordChatExporter.Cli.Verbs
                 }
             }
 
-            // Generate default file name
-            string fileName = ExportHelper.GetDefaultExportFileName(Options.ExportFormat, guild,
-                null, Options.After, Options.Before);
+            if (Options.BucketName != null)
+            {
+                Console.Write($"Exporting bundled chatlog of guild [{guild.Id}]... ");
+                using (InlineProgress progress = new InlineProgress())
+                {
+                    // upload bundled chatlog to s3
+                    await exportService.UploadToS3(Options.BucketName, filePath, progress);
 
-            // Generate file path
-            string filePath = Path.Combine(Options.OutputPath ?? "", fileName);
+                    // Report successful completion
+                    progress.ReportCompletion();
+                }
 
-            // Export
-            await exportService.ExportChatLogAsync(chatLogs, filePath, Options.ExportFormat, Options.BucketName);
-
+            }
 
         }
 

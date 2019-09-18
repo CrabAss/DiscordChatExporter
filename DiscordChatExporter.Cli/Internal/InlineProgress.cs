@@ -39,7 +39,7 @@ namespace DiscordChatExporter.Cli.Internal
 
             // Inform about completion
             if (_isCompleted)
-                Console.WriteLine("Completed ✓");
+                Console.WriteLine("Completed √");
             else
                 Console.WriteLine("Failed X");
         }

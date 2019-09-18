@@ -1,4 +1,5 @@
 ﻿using DiscordChatExporter.Core.Models;
+using DiscordChatExporter.Core.Rendering;
 using DiscordChatExporter.Core.Services.Exceptions;
 using DiscordChatExporter.Core.Services.Internal;
 using Failsafe;
@@ -216,12 +217,91 @@ namespace DiscordChatExporter.Core.Services
 
             // Add last message
             result.Add(lastMessage);
-            //result.RemoveAll(x => x == null);   // remove null messages (BUG?)
 
             // Report progress
             progress?.Report(1);
 
             return result;
+        }
+
+        public async Task GetAndExportChannelMessagesAsync(AuthToken token, Guild guild, Channel channel,
+            CsvChatLogRenderer renderer, DateTimeOffset? after = null, DateTimeOffset? before = null, 
+            IProgress<double> progress = null)
+        {
+            //List<Message> result = new List<Message>();
+            Message firstMsg = null, currentLastMsg = null;
+            Mentionables mentionables = null;
+
+            // Get the last message
+            JToken response = await GetApiResponseAsync(token, "channels", $"{channel.Id}/messages",
+                "limit=1", $"before={before?.ToSnowflake()}");
+            Message lastMessage = response.Select(ParseMessage).FirstOrDefault();
+
+            // If the last message doesn't exist or it's outside of range - return
+            if (lastMessage == null || lastMessage.Timestamp < after)
+            {
+                progress?.Report(1);
+                return;
+            }
+
+            // Get other messages
+            string offsetId = after?.ToSnowflake() ?? "0";
+            while (true)
+            {
+                // Get message batch
+                response = await GetApiResponseAsync(token, "channels", $"{channel.Id}/messages",
+                    "limit=100", $"after={offsetId}");
+
+                // Parse
+                Message[] messages = response
+                    .Select(ParseMessage)
+                    .Reverse() // reverse because messages appear newest first
+                    .ToArray();
+
+                // Break if there are no messages (can happen if messages are deleted during execution)
+                if (!messages.Any())
+                    break;
+
+                // Trim messages to range (until last message)
+                Message[] messagesInRange = messages
+                    .TakeWhile(m => m.Id != lastMessage.Id && m.Timestamp < lastMessage.Timestamp)
+                    .ToArray();
+
+                if (firstMsg == null)
+                    firstMsg = messagesInRange.First();
+                currentLastMsg = messagesInRange.Last();
+
+                mentionables = await GetMentionablesAsync(token, guild.Id, messagesInRange);
+
+                await renderer.RenderAsync(new ChatLog(guild, channel, after, before, messagesInRange, mentionables));
+
+                // Add to result
+                // result.AddRange(messagesInRange);
+
+                // Break if messages were trimmed (which means the last message was encountered)
+                if (messagesInRange.Length != messages.Length)
+                    break;
+
+                // Report progress (based on the time range of parsed messages compared to total)
+                progress?.Report((currentLastMsg.Timestamp - firstMsg.Timestamp).TotalSeconds /
+                                 (lastMessage.Timestamp - firstMsg.Timestamp).TotalSeconds);
+
+                // Move offset
+                offsetId = currentLastMsg.Id;
+            }
+
+            var lastMessageList = new Message[] { lastMessage };
+
+            mentionables = await GetMentionablesAsync(token, guild.Id, lastMessageList);
+
+            await renderer.RenderAsync(new ChatLog(guild, channel, after, before, lastMessageList, mentionables));
+
+            // Add last message
+            // result.Add(lastMessage);
+
+            // Report progress
+            progress?.Report(1);
+
         }
 
         public async Task<Mentionables> GetMentionablesAsync(AuthToken token, string guildId,

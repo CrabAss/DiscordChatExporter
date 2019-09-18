@@ -9,7 +9,7 @@ using Tyrrrz.Extensions;
 
 namespace DiscordChatExporter.Core.Rendering
 {
-    public class CsvGuildMembersRenderer : IChatRenderer
+    public class CsvGuildMembersRenderer
     {
 
         private readonly IReadOnlyList<GuildMember> _guildMembers;

@@ -15,16 +15,16 @@
         public uint Position { get; }
 
 
-/* 项目“DiscordChatExporter.Core.Models (netcoreapp2.2)”的未合并的更改
-在此之前:
-        public Permissions PermissionSet { get; }
-        
-        public bool IsManaged { get; }
-在此之后:
-        public Permissions PermissionSet { get; }
+        /* 项目“DiscordChatExporter.Core.Models (netcoreapp2.2)”的未合并的更改
+        在此之前:
+                public Permissions PermissionSet { get; }
 
-        public bool IsManaged { get; }
-*/
+                public bool IsManaged { get; }
+        在此之后:
+                public Permissions PermissionSet { get; }
+
+                public bool IsManaged { get; }
+        */
         public Permissions PermissionSet { get; }
 
         public bool IsManaged { get; }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DiscordChatExporter.Core.Rendering
 {
-    public class CsvGuildRolesRenderer : IChatRenderer
+    public class CsvGuildRolesRenderer
     {
 
         private readonly IReadOnlyList<Role> _roles;

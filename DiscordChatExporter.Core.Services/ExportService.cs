@@ -17,7 +17,6 @@ namespace DiscordChatExporter.Core.Services
         private readonly SettingsService _settingsService;
 
         // AWS S3
-        // private const string bucketName = "chatrank";
         private static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUWest2;
         private static IAmazonS3 s3Client;
 
@@ -29,63 +28,6 @@ namespace DiscordChatExporter.Core.Services
             s3Client = new AmazonS3Client(bucketRegion);
         }
 
-        private IChatRenderer CreateRenderer(ChatLog chatLog, ExportFormat format)
-        {
-            if (format == ExportFormat.PlainText)
-                return new PlainTextChatLogRenderer(chatLog, _settingsService.DateFormat);
-
-            if (format == ExportFormat.HtmlDark)
-                return new HtmlChatLogRenderer(chatLog, "Dark", _settingsService.DateFormat);
-
-            if (format == ExportFormat.HtmlLight)
-                return new HtmlChatLogRenderer(chatLog, "Light", _settingsService.DateFormat);
-
-            if (format == ExportFormat.Csv)
-                return new CsvChatLogRenderer(chatLog, _settingsService.DateFormat);
-
-            throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
-        }
-
-        private IChatRenderer CreateRenderer(IReadOnlyList<ChatLog> chatLogs, ExportFormat format)
-        {
-            if (format == ExportFormat.Csv)
-                return new CsvBundledChatLogRenderer(chatLogs, _settingsService.DateFormat);
-
-            throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
-        }
-
-        private IChatRenderer CreateRenderer(IReadOnlyList<GuildMember> guildMembers, ExportFormat format)
-        {
-            if (format == ExportFormat.Csv)
-                return new CsvGuildMembersRenderer(guildMembers, _settingsService.DateFormat);
-
-            throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
-        }
-
-        private IChatRenderer CreateRenderer(IReadOnlyList<Role> roles, ExportFormat format)
-        {
-            if (format == ExportFormat.Csv)
-                return new CsvGuildRolesRenderer(roles, _settingsService.DateFormat);
-
-            throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
-        }
-
-        private IChatRenderer CreateRenderer(IReadOnlyList<Channel> channels, ExportFormat format)
-        {
-            if (format == ExportFormat.Csv)
-                return new CsvGuildChannelsRenderer(channels, _settingsService.DateFormat);
-
-            throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
-        }
-
-        private IChatRenderer CreateRenderer(Guild guild, ExportFormat format)
-        {
-            if (format == ExportFormat.Csv)
-                return new CsvGuildRenderer(guild, _settingsService.DateFormat);
-
-            throw new ArgumentOutOfRangeException(nameof(format), $"Unknown format [{format}].");
-        }
-
         public async Task ExportGuildMembersAsync(IReadOnlyList<GuildMember> guildMembers, string filePath, ExportFormat format, string S3BucketName = null)
         {
             // Create output directory
@@ -93,9 +35,11 @@ namespace DiscordChatExporter.Core.Services
             if (!dirPath.IsNullOrWhiteSpace())
                 Directory.CreateDirectory(dirPath);
 
+            var renderer = new CsvGuildMembersRenderer(guildMembers, _settingsService.DateFormat);
+
             // Render chat log to output file
             using (var writer = File.CreateText(filePath))
-                await CreateRenderer(guildMembers, format).RenderAsync(writer);
+                await renderer.RenderAsync(writer);
 
             if (S3BucketName != null)
                 await UploadToS3(S3BucketName, filePath);
@@ -108,9 +52,11 @@ namespace DiscordChatExporter.Core.Services
             if (!dirPath.IsNullOrWhiteSpace())
                 Directory.CreateDirectory(dirPath);
 
+            var renderer = new CsvGuildRolesRenderer(roles, _settingsService.DateFormat);
+
             // Render chat log to output file
             using (var writer = File.CreateText(filePath))
-                await CreateRenderer(roles, format).RenderAsync(writer);
+                await renderer.RenderAsync(writer);
 
             if (S3BucketName != null)
                 await UploadToS3(S3BucketName, filePath);
@@ -123,9 +69,11 @@ namespace DiscordChatExporter.Core.Services
             if (!dirPath.IsNullOrWhiteSpace())
                 Directory.CreateDirectory(dirPath);
 
+            var renderer = new CsvGuildChannelsRenderer(channels, _settingsService.DateFormat);
+
             // Render chat log to output file
             using (var writer = File.CreateText(filePath))
-                await CreateRenderer(channels, format).RenderAsync(writer);
+                await renderer.RenderAsync(writer);
 
             if (S3BucketName != null)
                 await UploadToS3(S3BucketName, filePath);
@@ -138,31 +86,29 @@ namespace DiscordChatExporter.Core.Services
             if (!dirPath.IsNullOrWhiteSpace())
                 Directory.CreateDirectory(dirPath);
 
+            var renderer = new CsvGuildRenderer(guild, _settingsService.DateFormat);
+
             // Render chat log to output file
             using (var writer = File.CreateText(filePath))
-                await CreateRenderer(guild, format).RenderAsync(writer);
+                await renderer.RenderAsync(writer);
 
             if (S3BucketName != null)
                 await UploadToS3(S3BucketName, filePath);
         }
 
         /* Bundled ChatLog Export */
-        public async Task ExportChatLogAsync(IReadOnlyList<ChatLog> chatLogs, string filePath, ExportFormat format, string S3BucketName = null)
+        public CsvChatLogRenderer CreateChatLogRenderer(string filePath)
         {
             // Create output directory
             var dirPath = Path.GetDirectoryName(filePath);
             if (!dirPath.IsNullOrWhiteSpace())
                 Directory.CreateDirectory(dirPath);
 
-            // Render chat log to output file
-            File.Delete(filePath);
-            using (var writer = File.AppendText(filePath))
-                await CreateRenderer(chatLogs, format).RenderAsync(writer);
-
-            if (S3BucketName != null)
-                await UploadToS3(S3BucketName, filePath);
+            return new CsvChatLogRenderer(filePath, _settingsService.DateFormat);
         }
 
+
+        // !! MAY HAVE BUGS
         private async Task ExportChatLogAsync(ChatLog chatLog, string filePath, ExportFormat format, string S3BucketName = null)
         {
             // Create output directory
@@ -170,9 +116,13 @@ namespace DiscordChatExporter.Core.Services
             if (!dirPath.IsNullOrWhiteSpace())
                 Directory.CreateDirectory(dirPath);
 
+
             // Render chat log to output file
             using (var writer = File.CreateText(filePath))
-                await CreateRenderer(chatLog, format).RenderAsync(writer);
+            {
+                var renderer = new CsvChatLogRenderer(filePath, _settingsService.DateFormat);
+                await renderer.RenderAsync(chatLog);
+            }
 
             if (S3BucketName != null)
                 await UploadToS3(S3BucketName, filePath);
@@ -221,14 +171,35 @@ namespace DiscordChatExporter.Core.Services
             }
         }
 
-        public async Task UploadToS3(string bucketName, string filePath, bool deleteLocalCopyAfterUpload = true)
+        public async Task UploadToS3(string bucketName, string filePath, IProgress<double> progress = null, 
+            bool deleteLocalCopyAfterUpload = true)
         {
-            string today = DateTime.Today.ToString("yyyyMMdd");
-            string keyName = $"discord/raw_archive/{today}/{filePath}";
+            string keyName = $"discord/raw_archive/{_settingsService.startDate}/{filePath}";
             try
             {
                 var fileTransferUtility = new TransferUtility(s3Client);
-                await fileTransferUtility.UploadAsync(filePath, bucketName, keyName);
+
+                var uploadRequest = new TransferUtilityUploadRequest
+                {
+                    BucketName = bucketName,
+                    FilePath = filePath,
+                    Key = keyName
+                };
+
+                if (progress != null)
+                {
+                    uploadRequest.UploadProgressEvent += new EventHandler<UploadProgressArgs>(
+                        delegate(object sender, UploadProgressArgs e)
+                        {
+                            progress?.Report(e.TransferredBytes / e.TotalBytes);
+                        }
+                    );
+                }
+
+                await fileTransferUtility.UploadAsync(uploadRequest);
+
+                if (progress != null) progress?.Report(1);
+
                 if (deleteLocalCopyAfterUpload) File.Delete(filePath);
             }
             catch (AmazonS3Exception e)
@@ -240,6 +211,11 @@ namespace DiscordChatExporter.Core.Services
                 Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
             }
 
+        }
+
+        private static void uploadRequest_UploadPartProgressEvent(object sender, UploadProgressArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }
