@@ -3,9 +3,9 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>netcoreapp2.2;net46</TargetFrameworks>
-    <Version>2.14.1</Version>
-    <Company>Tyrrrz</Company>
-    <Copyright>Copyright (c) Alexey Golub</Copyright>
+    <Version>2.14.3</Version>
+    <Company>Tyrrrz, CrabAss</Company>
+    <Copyright>Copyright (c) Alexey Golub, Henry Zhang</Copyright>
     <ApplicationIcon>..\favicon.ico</ApplicationIcon>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <LangVersion>latest</LangVersion>
