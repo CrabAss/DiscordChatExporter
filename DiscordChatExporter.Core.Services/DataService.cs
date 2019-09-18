@@ -25,8 +25,8 @@ namespace DiscordChatExporter.Core.Services
             IRetry retry = Retry.Create()
                 .Catch<HttpErrorStatusCodeException>(false, e => (int)e.StatusCode >= 500)
                 .Catch<HttpErrorStatusCodeException>(false, e => (int)e.StatusCode == 429)
-                .WithMaxTryCount(10)
-                .WithDelay(TimeSpan.FromSeconds(0.4));
+                .WithMaxTryCount(1000)
+                .WithDelay(TimeSpan.FromSeconds(0.5));
 
             // Send request
             return await retry.ExecuteAsync(async () =>
