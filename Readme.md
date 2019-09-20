@@ -1,31 +1,19 @@
 # DiscordChatExporter
 
-[![Build](https://img.shields.io/appveyor/ci/Tyrrrz/DiscordChatExporter/master.svg)](https://ci.appveyor.com/project/Tyrrrz/DiscordChatExporter)
-[![Release](https://img.shields.io/github/release/Tyrrrz/DiscordChatExporter.svg)](https://github.com/Tyrrrz/DiscordChatExporter/releases)
-[![Downloads](https://img.shields.io/github/downloads/Tyrrrz/DiscordChatExporter/total.svg)](https://github.com/Tyrrrz/DiscordChatExporter/releases)
-[![Donate](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://patreon.com/tyrrrz)
-[![Donate](https://img.shields.io/badge/buymeacoffee-donate-yellow.svg)](https://buymeacoffee.com/tyrrrz)
-
 DiscordChatExporter can be used to export message history from a [Discord](https://discordapp.com) channel to a file. It works for both direct message chats and guild chats, supports markdown, message grouping, embeds, attachments, mentions, reactions and other features. It works with both user and bot tokens, supports multiple output formats and allows you to trim messages by dates.
+
+This is a modified version of [Tyrrrz's DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter) by CrabAss for some data analysis project. This modified version only focuses on CSV format and is able to export more kinds of data/metadata like guild members, roles, channels and guilds.
 
 ## Download
 
-- [Stable releases](https://github.com/Tyrrrz/DiscordChatExporter/releases)
-- [Docker](https://hub.docker.com/r/tyrrrz/discordchatexporter): `docker pull tyrrrz/discordchatexporter`
-- [Continuous integration](https://ci.appveyor.com/project/Tyrrrz/DiscordChatExporter)
+- [Stable releases](https://github.com/CrabAss/DiscordChatExporter/releases)
 
 ## Features
 
-- Graphical and command line interfaces
+- Command line interface
 - Supports both user tokens and bot tokens
 - Allows retrieving messages in specified date range
-- Multiple export formats: HTML (dark/light), TXT and CSV
 - Renders all message features including: markdown, attachments, embeds, emojis, mentions, etc
-
-## Screenshots
-
-![](http://www.tyrrrz.me/Projects/DiscordChatExporter/Images/1.png)
-![](http://www.tyrrrz.me/Projects/DiscordChatExporter/Images/4.png)
 
 ## Libraries used
 
@@ -41,7 +29,9 @@ DiscordChatExporter can be used to export message history from a [Discord](https
 - [Onova](https://github.com/Tyrrrz/Onova)
 - [Tyrrrz.Extensions](https://github.com/Tyrrrz/Extensions)
 - [Tyrrrz.Settings](https://github.com/Tyrrrz/Settings)
+- [AWSSDK.Core](https://github.com/aws/aws-sdk-net)
+- [AWSSDK.S3](https://github.com/aws/aws-sdk-net)
 
 ## Donate
 
-If you really like my projects and want to support me, consider donating to me on [Patreon](https://patreon.com/tyrrrz) or [BuyMeACoffee](https://buymeacoffee.com/tyrrrz). All donations are optional and are greatly appreciated. 🙏
+You may consider donating to the original author [Tyrrrz](https://github.com/Tyrrrz) on [Patreon](https://patreon.com/tyrrrz) or [BuyMeACoffee](https://buymeacoffee.com/tyrrrz) if you like.

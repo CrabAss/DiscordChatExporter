@@ -25,7 +25,7 @@ namespace DiscordChatExporter.Core.Services
             IRetry retry = Retry.Create()
                 .Catch<HttpErrorStatusCodeException>(false, e => (int)e.StatusCode >= 500)
                 .Catch<HttpErrorStatusCodeException>(false, e => (int)e.StatusCode == 429)
-                .WithMaxTryCount(1000)
+                .WithMaxTryCount(7200)
                 .WithDelay(TimeSpan.FromSeconds(0.5));
 
             // Send request
@@ -85,14 +85,12 @@ namespace DiscordChatExporter.Core.Services
 
         public async Task<IReadOnlyList<GuildMember>> GetGuildMembersAsync(AuthToken token, string guildId)
         {
-            // Special case for direct messages pseudo-guild ...
-
             List<GuildMember> result = new List<GuildMember>();
 
             string offsetId = "0";
             while (true)
             {
-                // Get message batch
+                // Get guild member batch
                 JToken response = await GetApiResponseAsync(token, "guilds", $"{guildId}/members",
                     "limit=1000", $"after={offsetId}");
 
@@ -101,14 +99,14 @@ namespace DiscordChatExporter.Core.Services
                     .Select(ParseGuildMember)
                     .ToArray();
 
-                // Break if there are no messages (can happen if messages are deleted during execution)
+                // Break if there are no guild members
                 if (!guildMembers.Any())
                     break;
 
                 // Add to result
                 result.AddRange(guildMembers);
 
-                // Break if messages were trimmed (which means the last message was encountered)
+                // Break if guild members were trimmed (which means the last guild member was encountered)
                 if (guildMembers.Length != 1000)
                     break;
 
@@ -183,7 +181,7 @@ namespace DiscordChatExporter.Core.Services
             {
                 // Get message batch
                 response = await GetApiResponseAsync(token, "channels", $"{channelId}/messages",
-                    "limit=100", $"after={offsetId}");
+                    "limit=500", $"after={offsetId}");      // try to speed up
 
                 // Parse
                 Message[] messages = response
@@ -249,7 +247,7 @@ namespace DiscordChatExporter.Core.Services
             {
                 // Get message batch
                 response = await GetApiResponseAsync(token, "channels", $"{channel.Id}/messages",
-                    "limit=100", $"after={offsetId}");
+                    "limit=1000", $"after={offsetId}");
 
                 // Parse
                 Message[] messages = response
